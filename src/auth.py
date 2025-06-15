@@ -83,6 +83,5 @@ def authenticate(username, password):
     user = db.query(User).filter(User.username == username).first()
     db.close()
     if user and bcrypt.checkpw(password.encode(), user.password):
-        if user.profile in ("Sistema", "Administrador"):
-            return True
-    return False
+        return user
+    return None
