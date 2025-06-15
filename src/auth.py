@@ -78,9 +78,11 @@ def get_all_users():
 
     return users
 
-def verify_user(username, password):
-    users = get_all_users()
-    for user in users:
-        if user.username == username and bcrypt.checkpw(password.encode(), user.password):
+def authenticate(username, password):
+    db = SessionLocal()
+    user = db.query(User).filter(User.username == username).first()
+    db.close()
+    if user and bcrypt.checkpw(password.encode(), user.password):
+        if user.profile in ("Sistema", "Administrador"):
             return True
     return False
