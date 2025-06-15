@@ -14,7 +14,7 @@ class User(Base):
     token_exp_minutes = Column(Integer)
     profile = Column(String, default="user")  # Novo campo perfil com valor padrão "user"
 
-engine = create_engine("sqlite:///database.db")
+engine = create_engine("sqlite:///database/database.db")
 Base.metadata.create_all(bind=engine)
 SessionLocal = sessionmaker(bind=engine)
 

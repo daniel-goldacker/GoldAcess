@@ -1,6 +1,6 @@
 
 import streamlit as st 
-from auth import verify_user
+from auth import authenticate
 
 def login():
     st.title("🔐 Login")
@@ -9,7 +9,7 @@ def login():
     login_pass = st.text_input("Senha", type="password")
 
     if st.button("Entrar"):
-        if verify_user(login_user, login_pass):
+        if authenticate(login_user, login_pass):
             st.session_state.logged_in = True
             st.session_state.username_logged = login_user
             st.session_state.login_failed = False

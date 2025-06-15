@@ -1,8 +1,8 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-from create_new_user import create_new_user
-from list_users import list_users
-from login import login
+from frontend.create_new_user import create_new_user
+from frontend.list_users import list_users
+from frontend.login import login
 
 st.set_page_config(page_title="Gerenciador de Identidade", layout="centered")
 
