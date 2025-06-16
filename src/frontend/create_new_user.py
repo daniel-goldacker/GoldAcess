@@ -1,12 +1,13 @@
 import streamlit as st
 from auth import create_user
+from config import ConfigParametersApplication
 
 def create_new_user():
     defaults = {
         "username": "", 
         "password": "",
-        "exp_minutes": 60,
-        "profile": "APIs",
+        "exp_minutes": ConfigParametersApplication.DEFAULT_EXP_MINUTES,
+        "profile": ConfigParametersApplication.DEFAULT_PROFILE,
         "clear_fields": False
     }
 
@@ -17,8 +18,8 @@ def create_new_user():
     if st.session_state.get("clear_fields", True):
         st.session_state.username = ""
         st.session_state.password = ""
-        st.session_state.exp_minutes = 60
-        st.session_state.profile = "APIs"
+        st.session_state.exp_minutes = ConfigParametersApplication.DEFAULT_EXP_MINUTES
+        st.session_state.profile = ConfigParametersApplication.DEFAULT_PROFILE
         st.session_state.clear_fields = False
     
     st.subheader("👤 Criar novo usuário")

@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, create_engine, LargeBinary
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from config import ConfigParametersApplication, ConfigParametersDatabase
+from config import ConfigParametersAdmin, ConfigParametersDatabase
 import bcrypt
 
 Base = declarative_base()
@@ -21,14 +21,14 @@ SessionLocal = sessionmaker(bind=engine)
 
 def create_admin_user():
     session = SessionLocal()
-    admin = session.query(User).filter_by(username=ConfigParametersApplication.NAME_ADMIN).first()
+    admin = session.query(User).filter_by(username=ConfigParametersAdmin.NAME_ADMIN).first()
     if not admin:
-        hashed_pw = bcrypt.hashpw(ConfigParametersApplication.PASSWORD_ADMIN.encode(), bcrypt.gensalt())
+        hashed_pw = bcrypt.hashpw(ConfigParametersAdmin.PASSWORD_ADMIN.encode(), bcrypt.gensalt())
         admin_user = User(
-            username=ConfigParametersApplication.NAME_ADMIN,
+            username=ConfigParametersAdmin.NAME_ADMIN,
             password=hashed_pw,
-            token_exp_minutes=ConfigParametersApplication.TOKEN_EXP_MINUTES_ADMIN,
-            profile=ConfigParametersApplication.PROFILE_ADMIN
+            token_exp_minutes=ConfigParametersAdmin.TOKEN_EXP_MINUTES_ADMIN,
+            profile=ConfigParametersAdmin.PROFILE_ADMIN
         )
         session.add(admin_user)
         session.commit()
