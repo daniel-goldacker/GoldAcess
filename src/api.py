@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Form, Header
+from fastapi import FastAPI, Form, Header, status
+from fastapi.responses import JSONResponse
 from auth import authenticate, generate_token, verify_token
 
 app = FastAPI()
@@ -7,13 +8,29 @@ app = FastAPI()
 def api_auth(username: str = Form(...), password: str = Form(...)):
     user = authenticate(username, password)
     if user:
-        token = generate_token(user)
-        return {"status": "ok", "token": token}
-    return {"status": "fail", "message": "Credenciais inválidas"}
+        if user.profile not in ("Administrador", "Sistema"):
+            token = generate_token(user)
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={"status": "ok", "token": token}
+            )
+        else:
+            return JSONResponse(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                content={"status": "fail", "message": "Usuário não liberdo para solicitação de tokens"}
+            )
+
+    return JSONResponse(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                content={"status": "fail", "message": "Credenciais inválidas"}
+            )
 
 @app.get("/api/verify")
 def api_verify(authorization: str = Header(...)):
     if not authorization.startswith("Bearer "):
-        return {"valid": False, "reason": "Formato inválido"}
+        return  JSONResponse(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                content={"valid": False, "reason": "Formato inválido"}
+            )
     token = authorization.split(" ")[1]
     return verify_token(token)
