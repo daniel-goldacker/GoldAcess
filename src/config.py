@@ -15,3 +15,7 @@ class ConfigParametersApplication():
    
 class ConfigParametersDatabase():    
     DATABASE = 'sqlite:///database/database.db'
+
+class ConfigParametersSecurity():
+    SECRET_KEY = os.getenv('SECRET_KEY')
+    ALGORITHMS_CRYPTOGRAPHY = os.getenv('ALGORITHMS_CRYPTOGRAPHY')
