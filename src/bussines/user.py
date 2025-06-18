@@ -3,21 +3,28 @@ from db import SessionLocal, User
 from sqlalchemy.orm import joinedload
 from typing import Optional
 
-def create_user(username: str, password: str, token_exp_minutes: int, profile_id: int, visible: bool):
-    db = SessionLocal()
-    hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+def add_user(username: str, password: str, token_exp_minutes: int, profile_id: int, visible: bool):
+    session = SessionLocal()
+    try: 
+        existing = session.query(User).filter_by(username=username).first()
+        if existing:
+            return False, "Perfil já existe!"
     
-    user = User(
-        username=username,
-        password=hashed_pw,
-        token_exp_minutes=token_exp_minutes,
-        profile_id=profile_id,
-        visible=visible
-    )
-    
-    db.add(user)
-    db.commit()
-    db.close()
+        hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+        
+        user = User(
+            username=username,
+            password=hashed_pw,
+            token_exp_minutes=token_exp_minutes,
+            profile_id=profile_id,
+            visible=visible
+        )
+        
+        session.add(user)
+        session.commit()
+        return True, "Usuário criado com sucesso."
+    finally:
+        session.close()
 
 
 def update_user(username: str, new_password: Optional[str] = None,
@@ -28,7 +35,7 @@ def update_user(username: str, new_password: Optional[str] = None,
     try:
         user = session.query(User).filter_by(username=username).first()
         if not user:
-            return False
+            return False, "Usuário não encontrado."
 
         if new_password:
             hashed_pw = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
@@ -43,32 +50,39 @@ def update_user(username: str, new_password: Optional[str] = None,
             user.visible = new_visible
 
         session.commit()
-        return True
-    except Exception as e:
-        session.rollback()
-        raise e
+        return True, "Usuário atualizado com sucesso."
     finally:
         session.close()
 
 def delete_user(username: str):
     session = SessionLocal()
-    user = session.query(User).filter(User.username == username).first()
-    if user:
+
+    try:
+        user = session.query(User).filter(User.username == username).first()
+        if not user:
+            return False, "Usuário não encontrado."
+        
         session.delete(user)
         session.commit()
-    session.close()
+        return True, "Usuário excluído com sucesso."
+    finally:
+        session.close()
 
 def get_all_users():
     session = SessionLocal()
-    users = session.query(User).options(joinedload(User.profile)).all()
-    session.close()
-    
-    return users
+    try:
+        users = session.query(User).options(joinedload(User.profile)).all()
+        return users
+    finally:
+        session.close()
 
 def authenticate(username: str, password: str):
-    db = SessionLocal()
-    user = db.query(User).filter(User.username == username).first()
-    db.close()
-    if user and bcrypt.checkpw(password.encode(), user.password):
-        return user
-    return None
+    session = SessionLocal()
+    try: 
+        user = session.query(User).filter(User.username == username).first()
+        if user and bcrypt.checkpw(password.encode(), user.password):
+            return user
+        else:
+            return False
+    finally:
+        session.close()

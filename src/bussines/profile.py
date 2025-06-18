@@ -52,7 +52,10 @@ def delete_profile(profile_id: int):
 
 def get_all_profiles():
     session = SessionLocal()
-    profiles = session.query(Profile).all()
-    session.close()
+    try:
+        profiles = session.query(Profile).all()
+        return profiles
+    finally:
+        session.close()
 
-    return profiles
+ 

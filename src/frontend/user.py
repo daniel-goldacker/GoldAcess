@@ -1,5 +1,5 @@
 import streamlit as st
-from bussines.user import create_user, update_user, delete_user, get_all_users
+from bussines.user import add_user, update_user, delete_user, get_all_users
 from bussines.profile import get_all_profiles, get_profiles
 from config import ConfigParametersApplication
 from db import SessionLocal, Profile
@@ -52,7 +52,7 @@ def users():
                 st.warning("Usuário e senha são obrigatórios.")
             else:
                 try:
-                    create_user(username, password, exp_minutes, selected_profile_id, visible)
+                    add_user(username, password, exp_minutes, selected_profile_id, visible)
                     st.success(f"✅ Usuário '{username}' criado com sucesso.")
                     st.session_state.clear_fields = True
                     st.rerun()
