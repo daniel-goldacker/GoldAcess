@@ -39,9 +39,7 @@ def update_user(username: str, new_password: Optional[str] = None,
 
         if new_profile_id is not None:
             user.profile_id = new_profile_id
-            print("nao entrou")
         if new_visible is not None:
-            print("nao entrou")
             user.visible = new_visible
 
         session.commit()
