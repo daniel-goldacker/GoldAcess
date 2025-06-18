@@ -1,6 +1,6 @@
 import streamlit as st
 from bussines.user import create_user, update_user, delete_user, get_all_users
-from bussines.profile import get_all_profiles
+from bussines.profile import get_all_profiles, get_profiles
 from config import ConfigParametersApplication
 from db import SessionLocal, Profile
 
@@ -13,7 +13,8 @@ def users():
         "username": "",
         "password": "",
         "exp_minutes": ConfigParametersApplication.DEFAULT_EXP_MINUTES,
-        "clear_fields": False
+        "clear_fields": False,
+        "visible": True
     }
 
     for key, value in defaults.items():
@@ -26,13 +27,14 @@ def users():
         st.session_state.password = ""
         st.session_state.exp_minutes = ConfigParametersApplication.DEFAULT_EXP_MINUTES
         st.session_state.clear_fields = False
+        st.session_state.visible = True
 
     # --- Formulário de Criação ---
     with st.expander("➕ Criar novo usuário"):
         username = st.text_input("Usuário", key="username")
         password = st.text_input("Senha", type="password", key="password")
         exp_minutes = st.number_input("Minutos até expiração do token", min_value=1, key="exp_minutes")
-
+               
         # Buscar perfis
         profiles = get_all_profiles()
 
@@ -43,13 +45,14 @@ def users():
         profile_map = {p.name: p.id for p in profiles}
         selected_label = st.selectbox("Perfil do usuário", options=list(profile_map.keys()))
         selected_profile_id = profile_map[selected_label]
+        visible = st.checkbox("Visivel?", key=f"visible")
 
         if st.button("Criar"):
             if not username or not password:
                 st.warning("Usuário e senha são obrigatórios.")
             else:
                 try:
-                    create_user(username, password, exp_minutes, selected_profile_id)
+                    create_user(username, password, exp_minutes, selected_profile_id, visible)
                     st.success(f"✅ Usuário '{username}' criado com sucesso.")
                     st.session_state.clear_fields = True
                     st.rerun()
@@ -63,17 +66,13 @@ def users():
         st.session_state.edit_user_id = None
 
     users = get_all_users()
-    session = SessionLocal()
-    profile_dict = {p.id: p.name for p in session.query(Profile).all()}
-    session.close()
+    profiles = get_all_profiles()
 
     for user in users:
-        if user.username == "admin":
-            continue
-
+        profile =  get_profiles(user.profile_id)
         col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 1, 1])
         col1.markdown(f"**👤 {user.username}**")
-        col2.markdown(f"**🧩 {profile_dict.get(user.profile_id, 'Desconhecido')}**")
+        col2.markdown(f"**🧩 {profile.name}**")
         col3.markdown(f"🕒 Token: `{user.token_exp_minutes} min`")
 
         edit_clicked = col4.button("✏️", key=f"edit_{user.id}")
@@ -97,8 +96,12 @@ def users():
 
             new_password = st.text_input("🔑 Nova senha", type="password", key=f"pw_{user.id}")
             new_exp_minutes = st.number_input("⏱️ Novo tempo de expiração (minutos)", min_value=1, value=user.token_exp_minutes, key=f"exp_{user.id}")
-            new_profile_label = st.selectbox("Perfil do usuário", options=list(profile_map.keys()), index=list(profile_map.keys()).index(profile_dict.get(user.profile_id, "Administrador")), key=f"profile_{user.id}")
-            new_profile_id = profile_map[new_profile_label]
+
+            new_profile_map = {p.name: p.id for p in profiles}
+            new_profile_label = st.selectbox("Perfil do usuário", options=list(new_profile_map.keys()), key=f"profile_{user.id}")
+            new_profile_id = new_profile_map[new_profile_label]
+           
+            new_visible = st.checkbox("Visivel?", key=f"visible_{user.id}", value=user.visible)
 
             col_save, col_cancel = st.columns(2)
 
@@ -109,15 +112,17 @@ def users():
                     senha_alterada = bool(new_password_clean)
                     exp_alterado = new_exp_minutes != user.token_exp_minutes
                     perfil_alterado = new_profile_id != user.profile_id
+                    visible_alterado = new_visible != user.visible
 
-                    if not senha_alterada and not exp_alterado and not perfil_alterado:
+                    if not senha_alterada and not exp_alterado and not perfil_alterado and not visible_alterado:
                         st.warning("⚠️ Nenhuma alteração feita.")
                     else:
                         update_user(
                             username=user.username,
                             new_password=new_password_clean if senha_alterada else None,
                             new_token_exp_minutes=new_exp_minutes if exp_alterado else None,
-                            new_profile_id=new_profile_id if perfil_alterado else None
+                            new_profile_id=new_profile_id if perfil_alterado else None,
+                            new_visible=new_visible if visible_alterado else None
                         )
 
                         st.success("✅ Alterações salvas com sucesso.")

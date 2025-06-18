@@ -10,7 +10,8 @@ def profile():
         "generate_token": False,
         "admin": False,
         "clear_fields": False,
-        "edit_profile_id": None
+        "edit_profile_id": None,
+        "visible": True
     }
 
     for key, value in defaults.items():
@@ -21,20 +22,23 @@ def profile():
         st.session_state.profile_name = ""
         st.session_state.generate_token = False
         st.session_state.admin = False
+        st.session_state.visible = True
         st.session_state.clear_fields = False
+
 
     # Formulário de criação
     with st.expander("➕ Criar novo perfil"):
         profile_name = st.text_input("Nome do Perfil", key="profile_name")
         generate_token = st.checkbox("Pode gerar token?", key="generate_token")
         admin = st.checkbox("É administrador?", key="admin")
+        visible = st.checkbox("Visivel ?", key="visible")
 
         if st.button("Criar"):
             if not profile_name.strip():
                 st.warning("⚠️ O nome do perfil é obrigatório.")
             else:
                 try:
-                    add_profile(profile_name.strip(), generate_token, admin)
+                    add_profile(profile_name.strip(), generate_token, admin, visible)
                     st.success("✅ Perfil criado com sucesso.")
                     st.session_state.clear_fields = True
                     st.rerun()
@@ -72,12 +76,12 @@ def profile():
 
             new_generate_token = st.checkbox("Pode gerar token?", value=profile.generate_token, key=f"token_{profile.id}")
             new_admin = st.checkbox("É administrador?", value=profile.admin, key=f"admin_{profile.id}")
-
+            new_visible = st.checkbox("Visivel?", value=profile.visible, key=f"visible_{profile.id}")
             col_save, col_cancel = st.columns(2)
 
             if col_save.button("💾 Salvar alterações", key=f"save_{profile.id}"):
                 try:
-                    update_profile(profile.id, new_generate_token, new_admin)
+                    update_profile(profile.id, new_generate_token, new_admin, new_visible)
                     st.success("✅ Alterações salvas com sucesso.")
                     st.session_state.edit_profile_id = None
                     st.rerun()

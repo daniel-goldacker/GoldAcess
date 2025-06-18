@@ -11,11 +11,12 @@ class Profile(Base):
     __tablename__ = "profiles"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, index=True)  # Ex: "Administrador", "APIs"
+    name = Column(String, unique=True, index=True)
     generate_token = Column(Boolean, default=False)
     admin = Column(Boolean, default=False)
-
-    users = relationship("User", back_populates="profile")  # <- corrigido
+    visible = Column(Boolean, default=True)
+    
+    users = relationship("User", back_populates="profile")
 
 # Tabela de usuários
 class User(Base):
@@ -26,7 +27,9 @@ class User(Base):
     password = Column(LargeBinary)
     token_exp_minutes = Column(Integer)
     profile_id = Column(Integer, ForeignKey("profiles.id"))
-    profile = relationship("Profile", back_populates="users")  # <- nome da relação
+    visible = Column(Boolean, default=True)
+
+    profile = relationship("Profile", back_populates="users")
 
 # Configuração e criação das tabelas
 engine = create_engine(ConfigParametersDatabase.DATABASE)
@@ -41,7 +44,8 @@ def create_profiles():
         admin_profile = Profile(
             name=ConfigParametersAdmin.PROFILE_ADMIN,
             generate_token=False,
-            admin=True
+            admin=True,
+            visible=False
         )
         session.add(admin_profile)
         session.commit()
@@ -60,7 +64,8 @@ def create_admin_user():
             username=ConfigParametersAdmin.NAME_ADMIN,
             password=hashed_pw,
             token_exp_minutes=ConfigParametersAdmin.TOKEN_EXP_MINUTES_ADMIN,
-            profile_id=admin_profile.id  # <- corrigido
+            profile_id=admin_profile.id,
+            visible=False
         )
         session.add(admin_user)
         session.commit()

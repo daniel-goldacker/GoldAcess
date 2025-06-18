@@ -3,7 +3,7 @@ from db import SessionLocal, User
 from sqlalchemy.orm import joinedload
 from typing import Optional
 
-def create_user(username: str, password: str, token_exp_minutes: int, profile_id: int):
+def create_user(username: str, password: str, token_exp_minutes: int, profile_id: int, visible: bool):
     db = SessionLocal()
     hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
     
@@ -11,7 +11,8 @@ def create_user(username: str, password: str, token_exp_minutes: int, profile_id
         username=username,
         password=hashed_pw,
         token_exp_minutes=token_exp_minutes,
-        profile_id=profile_id  # <- Usar profile_id diretamente
+        profile_id=profile_id,
+        visible=visible
     )
     
     db.add(user)
@@ -21,7 +22,8 @@ def create_user(username: str, password: str, token_exp_minutes: int, profile_id
 
 def update_user(username: str, new_password: Optional[str] = None,
                      new_token_exp_minutes: Optional[int] = None,
-                     new_profile_id: Optional[int] = None):
+                     new_profile_id: Optional[int] = None,
+                     new_visible: Optional[bool] = None):
     session = SessionLocal()
     try:
         user = session.query(User).filter_by(username=username).first()
@@ -37,6 +39,10 @@ def update_user(username: str, new_password: Optional[str] = None,
 
         if new_profile_id is not None:
             user.profile_id = new_profile_id
+            print("nao entrou")
+        if new_visible is not None:
+            print("nao entrou")
+            user.visible = new_visible
 
         session.commit()
         return True
