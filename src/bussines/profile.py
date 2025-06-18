@@ -1,11 +1,13 @@
 from sqlalchemy.orm import Session
 from db import SessionLocal, Profile
 
-def get_profiles():
-    session: Session = SessionLocal()
+def get_profiles(profile_id:int):
+    session = SessionLocal()
     try:
-        profiles = session.query(Profile).all()
-        return profiles
+        profile = session.query(Profile).filter_by(id=profile_id).first()
+        if not profile:
+            return False, "Perfil não encontrado."
+        return profile
     finally:
         session.close()
 

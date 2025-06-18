@@ -2,6 +2,7 @@ from fastapi import FastAPI, Form, Header, status
 from fastapi.responses import JSONResponse
 from bussines.token import generate_token, verify_token
 from bussines.user import authenticate
+from bussines.profile import get_profiles
 
 app = FastAPI()
 
@@ -9,7 +10,9 @@ app = FastAPI()
 def api_auth(username: str = Form(...), password: str = Form(...)):
     user = authenticate(username, password)
     if user:
-        if user.profile not in ("Administrador", "Sistema"):
+        profile = get_profiles(user.profile_id)
+
+        if profile.generate_token:
             token = generate_token(user)
             return JSONResponse(
                 status_code=status.HTTP_200_OK,

@@ -2,6 +2,7 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 from frontend.login import login
 from frontend.user import users
+from frontend.profile import profile
 
 st.set_page_config(page_title="Gerenciador de Identidade", layout="centered")
 
