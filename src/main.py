@@ -1,10 +1,11 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-from frontend.create_new_user import create_new_user
-from frontend.list_users import list_users
 from frontend.login import login
+from frontend.user import users
 
 st.set_page_config(page_title="Gerenciador de Identidade", layout="centered")
+
+from frontend.profile import profile
 
 # --- Sessão de login ---
 if "logged_in" not in st.session_state:
@@ -24,16 +25,16 @@ with st.sidebar:
     
     menu = option_menu(
         "Menu",
-        ["Criar usuário", "Listar usuários", "Logout"],
+        ["Criar usuário", "Perfil", "Logout"],
         icons=["person-plus", "people", "box-arrow-right"],
         menu_icon="cast",
         default_index=0
     )
 
 if menu == "Criar usuário":
-  create_new_user()
-elif menu == "Listar usuários":
-   list_users(st.session_state.username_logged)
+  users()
+elif menu == "Perfil":
+   profile()
 elif menu == "Logout":
     st.session_state.logged_in = False
     st.session_state.username_logged = ""

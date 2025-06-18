@@ -1,4 +1,3 @@
-
 import streamlit as st 
 from auth import authenticate
 
@@ -11,15 +10,13 @@ def login():
     if st.button("Entrar"):
         user = authenticate(login_user, login_pass)
         if user:
-            if user.profile in ("Administrador", "Sistema"):
-                st.session_state.logged_in = True
-                st.session_state.user = user  # salva o objeto completo
-                st.session_state.username_logged = user.username
-                st.session_state.login_failed = False
-                st.rerun()
-            else:
-              st.session_state.login_failed = True  
-        else:
+            # Validação do nome do perfil relacionado
+            st.session_state.logged_in = True
+            st.session_state.user = user  # salva o objeto completo
+            st.session_state.username_logged = user.username
+            st.session_state.login_failed = False
+            st.rerun() 
+    else:
             st.session_state.login_failed = True
 
     if st.session_state.login_failed:

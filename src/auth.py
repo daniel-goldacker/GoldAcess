@@ -3,14 +3,9 @@ import jwt
 from datetime import datetime, timedelta
 from db import SessionLocal, User
 from config import ConfigParametersSecurity
+from sqlalchemy.orm import joinedload
 
-def create_user(username, password, token_exp_minutes, profile):
-    db = SessionLocal()
-    hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-    user = User(username=username, password=hashed_pw, profile=profile, token_exp_minutes=token_exp_minutes)
-    db.add(user)
-    db.commit()
-    db.close()
+
 
 def authenticate(username, password):
     db = SessionLocal()
@@ -54,11 +49,11 @@ def update_token(username, new_token_exp_minutes):
         session.commit()
     session.close()
 
-def update_profile(username, new_profile):
+def update_profile(username, new_profile_id):
     session = SessionLocal()
     user = session.query(User).filter_by(username=username).first()
     if user:
-        user.profile = new_profile
+        user.profile_id = new_profile_id
         session.commit()
     session.close()
 
@@ -72,8 +67,9 @@ def delete_user(username):
 
 def get_all_users():
     session = SessionLocal()
-    users = session.query(User).all()
+    users = session.query(User).options(joinedload(User.profile)).all()
     session.close()
+    return users
 
     return users
 
