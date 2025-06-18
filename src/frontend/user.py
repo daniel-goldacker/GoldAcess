@@ -1,6 +1,5 @@
 import streamlit as st
-from bussines.user import create_user
-from auth import get_all_users, delete_user, update_password, update_token, update_profile
+from bussines.user import create_user, update_user, delete_user, get_all_users
 from config import ConfigParametersApplication
 from db import SessionLocal, Profile
 
@@ -106,16 +105,25 @@ def users():
 
             if col_save.button("💾 Salvar alterações", key=f"save_{user.id}"):
                 try:
-                    if new_password.strip():
-                        update_password(user.username, new_password)
-                    if new_exp_minutes != user.token_exp_minutes:
-                        update_token(user.username, new_exp_minutes)
-                    if new_profile_id != user.profile_id:
-                        update_profile(user.username, new_profile_id)
+                    # Só envia o que foi alterado
+                    new_password_clean = new_password.strip()
+                    senha_alterada = bool(new_password_clean)
+                    exp_alterado = new_exp_minutes != user.token_exp_minutes
+                    perfil_alterado = new_profile_id != user.profile_id
 
-                    st.success("✅ Alterações salvas com sucesso.")
-                    st.session_state.edit_user_id = None
-                    st.rerun()
+                    if not senha_alterada and not exp_alterado and not perfil_alterado:
+                        st.warning("⚠️ Nenhuma alteração feita.")
+                    else:
+                        update_user(
+                            username=user.username,
+                            new_password=new_password_clean if senha_alterada else None,
+                            new_token_exp_minutes=new_exp_minutes if exp_alterado else None,
+                            new_profile_id=new_profile_id if perfil_alterado else None
+                        )
+
+                        st.success("✅ Alterações salvas com sucesso.")
+                        st.session_state.edit_user_id = None
+                        st.rerun()
                 except Exception as e:
                     st.error(f"❌ Erro ao atualizar usuário: {e}")
 

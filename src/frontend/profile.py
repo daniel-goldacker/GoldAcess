@@ -1,48 +1,7 @@
 import streamlit as st
 from sqlalchemy.orm import Session
+from bussines.profile import add_profile, get_profiles, update_profile, delete_profile
 from db import SessionLocal, Profile
-
-# Funções auxiliares
-def get_profiles():
-    session: Session = SessionLocal()
-    profiles = session.query(Profile).all()
-    session.close()
-    return profiles
-
-def add_profile(name, generate_token, admin):
-    session = SessionLocal()
-    existing = session.query(Profile).filter_by(name=name).first()
-    if existing:
-        st.warning("Perfil já existe!")
-    else:
-        profile = Profile(name=name, generate_token=generate_token, admin=admin)
-        session.add(profile)
-        session.commit()
-        st.success("Perfil criado com sucesso.")
-    session.close()
-
-def update_profile(profile_id, generate_token, admin):
-    session = SessionLocal()
-    profile = session.query(Profile).filter_by(id=profile_id).first()
-    if profile:
-        profile.generate_token = generate_token
-        profile.admin = admin
-        session.commit()
-        st.success("Perfil atualizado com sucesso.")
-    else:
-        st.error("Perfil não encontrado.")
-    session.close()
-
-def delete_profile(profile_id):
-    session = SessionLocal()
-    profile = session.query(Profile).filter_by(id=profile_id).first()
-    if profile:
-        session.delete(profile)
-        session.commit()
-        st.success("Perfil excluído com sucesso.")
-    else:
-        st.error("Perfil não encontrado.")
-    session.close()
 
 def profile():
     # Seção: Cadastrar novo perfil

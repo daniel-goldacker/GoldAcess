@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Form, Header, status
 from fastapi.responses import JSONResponse
-from auth import authenticate, generate_token, verify_token
+from bussines.token import generate_token, verify_token
+from bussines.user import authenticate
 
 app = FastAPI()
 

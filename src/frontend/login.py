@@ -1,5 +1,5 @@
 import streamlit as st 
-from auth import authenticate
+from bussines.user import authenticate
 
 def login():
     st.title("🔐 Login")
