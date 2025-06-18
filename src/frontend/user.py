@@ -80,7 +80,7 @@ def users():
 
         if delete_clicked:
             try:
-                delete_user(user.username)
+                delete_user(user.id)
                 if st.session_state.edit_user_id == user.id:
                     st.session_state.edit_user_id = None
                 st.rerun()
@@ -118,7 +118,7 @@ def users():
                         st.warning("⚠️ Nenhuma alteração feita.")
                     else:
                         update_user(
-                            username=user.username,
+                            user_id=user.id,
                             new_password=new_password_clean if senha_alterada else None,
                             new_token_exp_minutes=new_exp_minutes if exp_alterado else None,
                             new_profile_id=new_profile_id if perfil_alterado else None,

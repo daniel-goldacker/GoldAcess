@@ -27,13 +27,13 @@ def add_user(username: str, password: str, token_exp_minutes: int, profile_id: i
         session.close()
 
 
-def update_user(username: str, new_password: Optional[str] = None,
+def update_user(user_id: int, new_password: Optional[str] = None,
                      new_token_exp_minutes: Optional[int] = None,
                      new_profile_id: Optional[int] = None,
                      new_visible: Optional[bool] = None):
     session = SessionLocal()
     try:
-        user = session.query(User).filter_by(username=username).first()
+        user = session.query(User).filter_by(id=user_id).first()
         if not user:
             return False, "Usuário não encontrado."
 
@@ -54,11 +54,11 @@ def update_user(username: str, new_password: Optional[str] = None,
     finally:
         session.close()
 
-def delete_user(username: str):
+def delete_user(user_id: int):
     session = SessionLocal()
 
     try:
-        user = session.query(User).filter(User.username == username).first()
+        user = session.query(User).filter(User.id == user_id).first()
         if not user:
             return False, "Usuário não encontrado."
         
