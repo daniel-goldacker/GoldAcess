@@ -1,5 +1,6 @@
 import streamlit as st
 from bussines.user import create_user, update_user, delete_user, get_all_users
+from bussines.profile import get_all_profiles
 from config import ConfigParametersApplication
 from db import SessionLocal, Profile
 
@@ -33,9 +34,7 @@ def users():
         exp_minutes = st.number_input("Minutos até expiração do token", min_value=1, key="exp_minutes")
 
         # Buscar perfis
-        session = SessionLocal()
-        profiles = session.query(Profile).all()
-        session.close()
+        profiles = get_all_profiles()
 
         if not profiles:
             st.warning("⚠ Nenhum perfil encontrado no banco de dados.")

@@ -26,7 +26,7 @@ def update_user(username: str, new_password: Optional[str] = None,
     try:
         user = session.query(User).filter_by(username=username).first()
         if not user:
-            return False  # Usuário não encontrado
+            return False
 
         if new_password:
             hashed_pw = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
@@ -65,6 +65,6 @@ def authenticate(username: str, password: str):
     db = SessionLocal()
     user = db.query(User).filter(User.username == username).first()
     db.close()
-    if user and bcrypt.checkpw(password.encode(), user.password):  # <-- aqui está a correção
+    if user and bcrypt.checkpw(password.encode(), user.password):
         return user
     return None

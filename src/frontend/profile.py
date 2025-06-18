@@ -1,7 +1,5 @@
 import streamlit as st
-from sqlalchemy.orm import Session
 from bussines.profile import add_profile, get_profiles, update_profile, delete_profile
-from db import SessionLocal, Profile
 
 def profile():
     # Seção: Cadastrar novo perfil
@@ -12,7 +10,7 @@ def profile():
 
         if st.button("Adicionar") and new_name.strip():
             add_profile(new_name.strip(), new_gerar_token, new_admin)
-
+            st.rerun()
     st.divider()
 
     # Seção: Listar, editar e excluir perfis
@@ -28,8 +26,10 @@ def profile():
             with col2:
                 if st.button("💾 Salvar", key=f"save_{p.id}"):
                     update_profile(p.id, gerar_token_checkbox, admin_checkbox)
+                    st.rerun()
             with col3:
                 if st.button("🗑️ Excluir", key=f"delete_{p.id}"):
                     delete_profile(p.id)
+                    st.rerun()
 
     st.info("⚠️ A exclusão de perfis não verifica se estão vinculados a usuários. Adicione proteção se necessário.")

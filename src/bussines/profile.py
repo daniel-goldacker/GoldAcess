@@ -46,3 +46,10 @@ def delete_profile(profile_id: int):
         return True, "Perfil excluído com sucesso."
     finally:
         session.close()
+
+def get_all_profiles():
+    session = SessionLocal()
+    profiles = session.query(Profile).all()
+    session.close()
+
+    return profiles

@@ -12,7 +12,7 @@ def login():
         if user:
             # Validação do nome do perfil relacionado
             st.session_state.logged_in = True
-            st.session_state.user = user  # salva o objeto completo
+            st.session_state.user = user
             st.session_state.username_logged = user.username
             st.session_state.login_failed = False
             st.rerun() 
