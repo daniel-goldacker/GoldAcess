@@ -1,5 +1,6 @@
 import streamlit as st
 from bussines.profile import get_all_profiles, add_profile, update_profile, delete_profile
+from config import ConfigParametersAdmin
 
 def profile():
     st.subheader("🧩 Gerenciar Perfis")
@@ -31,7 +32,12 @@ def profile():
         profile_name = st.text_input("Nome do Perfil", key="profile_name")
         generate_token = st.checkbox("Pode gerar token?", key="generate_token")
         admin = st.checkbox("É administrador?", key="admin")
-        visible = st.checkbox("Visivel ?", key="visible")
+
+        if st.session_state.profile_logger == ConfigParametersAdmin.PROFILE_ADMIN:
+            visible = st.checkbox("Visivel ?", key="visible")
+        else:
+            visible = True 
+        
 
         if st.button("Criar"):
             if not profile_name.strip():
@@ -48,7 +54,7 @@ def profile():
     st.markdown("---")
     st.subheader("📋 Lista de Perfis")
 
-    profiles = get_all_profiles()
+    profiles = get_all_profiles(st.session_state.profile_logger)
 
     for profile in profiles:
         col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 1, 1]) 
@@ -76,7 +82,12 @@ def profile():
 
             new_generate_token = st.checkbox("Pode gerar token?", value=profile.generate_token, key=f"token_{profile.id}")
             new_admin = st.checkbox("É administrador?", value=profile.admin, key=f"admin_{profile.id}")
-            new_visible = st.checkbox("Visivel?", value=profile.visible, key=f"visible_{profile.id}")
+            
+            if st.session_state.profile_logger == ConfigParametersAdmin.PROFILE_ADMIN:
+                new_visible = st.checkbox("Visivel?", value=profile.visible, key=f"visible_{profile.id}")
+            else:
+                new_visible = True 
+                
             col_save, col_cancel = st.columns(2)
 
             if col_save.button("💾 Salvar alterações", key=f"save_{profile.id}"):

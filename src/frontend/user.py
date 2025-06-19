@@ -1,8 +1,7 @@
 import streamlit as st
 from bussines.user import add_user, update_user, delete_user, get_all_users
 from bussines.profile import get_all_profiles, get_profiles
-from config import ConfigParametersApplication
-from db import SessionLocal, Profile
+from config import ConfigParametersApplication, ConfigParametersAdmin
 
 
 def users():
@@ -33,10 +32,10 @@ def users():
     with st.expander("➕ Criar novo usuário"):
         username = st.text_input("Usuário", key="username")
         password = st.text_input("Senha", type="password", key="password")
-        exp_minutes = st.number_input("Minutos até expiração do token", min_value=1, key="exp_minutes")
+        exp_minutes = st.number_input("Minutos até expiração do token", min_value=0, key="exp_minutes")
                
         # Buscar perfis
-        profiles = get_all_profiles()
+        profiles = get_all_profiles(st.session_state.profile_logger)
 
         if not profiles:
             st.warning("⚠ Nenhum perfil encontrado no banco de dados.")
@@ -45,8 +44,11 @@ def users():
         profile_map = {p.name: p.id for p in profiles}
         selected_label = st.selectbox("Perfil do usuário", options=list(profile_map.keys()))
         selected_profile_id = profile_map[selected_label]
-        visible = st.checkbox("Visivel?", key=f"visible")
-
+        if st.session_state.profile_logger == ConfigParametersAdmin.PROFILE_ADMIN:
+            visible = st.checkbox("Visivel?", key=f"visible")
+        else:
+            visible = True    
+        
         if st.button("Criar"):
             if not username or not password:
                 st.warning("Usuário e senha são obrigatórios.")
@@ -65,8 +67,8 @@ def users():
     if "edit_user_id" not in st.session_state:
         st.session_state.edit_user_id = None
 
-    users = get_all_users()
-    profiles = get_all_profiles()
+    users = get_all_users(st.session_state.profile_logger)
+    profiles = get_all_profiles(st.session_state.profile_logger)
 
     for user in users:
         profile =  get_profiles(user.profile_id)
@@ -95,14 +97,17 @@ def users():
             st.markdown(f"### ✏️ Editar usuário: `{user.username}`")
 
             new_password = st.text_input("🔑 Nova senha", type="password", key=f"pw_{user.id}")
-            new_exp_minutes = st.number_input("⏱️ Novo tempo de expiração (minutos)", min_value=1, value=user.token_exp_minutes, key=f"exp_{user.id}")
+            new_exp_minutes = st.number_input("⏱️ Novo tempo de expiração (minutos)", min_value=0, value=user.token_exp_minutes, key=f"exp_{user.id}")
 
             new_profile_map = {p.name: p.id for p in profiles}
             new_profile_label = st.selectbox("Perfil do usuário", options=list(new_profile_map.keys()), key=f"profile_{user.id}")
             new_profile_id = new_profile_map[new_profile_label]
            
-            new_visible = st.checkbox("Visivel?", key=f"visible_{user.id}", value=user.visible)
-
+            if st.session_state.profile_logger == ConfigParametersAdmin.PROFILE_ADMIN:
+                new_visible = st.checkbox("Visivel?", key=f"visible_{user.id}", value=user.visible)
+            else:
+                new_visible = True 
+            
             col_save, col_cancel = st.columns(2)
 
             if col_save.button("💾 Salvar alterações", key=f"save_{user.id}"):

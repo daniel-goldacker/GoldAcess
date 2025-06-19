@@ -1,5 +1,5 @@
-from sqlalchemy.orm import Session
 from db import SessionLocal, Profile
+from config import ConfigParametersAdmin
 
 def get_profiles(profile_id:int):
     session = SessionLocal()
@@ -50,10 +50,14 @@ def delete_profile(profile_id: int):
     finally:
         session.close()
 
-def get_all_profiles():
+def get_all_profiles(profile_logged: str):
     session = SessionLocal()
     try:
-        profiles = session.query(Profile).all()
+        if profile_logged == ConfigParametersAdmin.PROFILE_ADMIN: 
+            profiles = session.query(Profile).all()  
+        else:     
+            profiles = session.query(Profile).filter(Profile.visible == True).all()    
+        
         return profiles
     finally:
         session.close()

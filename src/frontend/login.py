@@ -17,6 +17,7 @@ def login():
                 st.session_state.logged_in = True
                 st.session_state.user = user
                 st.session_state.username_logged = user.username
+                st.session_state.profile_logger = profile.name
                 st.session_state.login_failed = False
                 st.rerun() 
              else:
