@@ -3,9 +3,7 @@ from streamlit_option_menu import option_menu
 from frontend.login import login
 from frontend.user import users
 from frontend.profile import profile
-
-st.set_page_config(page_title="Gerenciador de Identidade", layout="centered")
-
+from frontend.home import home
 from frontend.profile import profile
 
 # --- Sessão de login ---
@@ -17,22 +15,21 @@ if "login_failed" not in st.session_state:
 if not st.session_state.logged_in:
    login()
 
-# --- Título ---
-st.title("🔐 Gerenciador de Identidade")
-
 # --- Menu lateral ---
 with st.sidebar:
     st.markdown(f"👤 Usuário logado: **{st.session_state.username_logged}**")
     
     menu = option_menu(
         "Menu",
-        ["Criar usuário", "Perfil", "Logout"],
-        icons=["person-plus", "people", "box-arrow-right"],
+        ["Home", "Criar usuário", "Perfil", "Logout"],
+        icons=["house", "person-plus", "people", "box-arrow-right"],
         menu_icon="cast",
         default_index=0
     )
 
-if menu == "Criar usuário":
+if menu == "Home":
+    home()
+elif menu == "Criar usuário":
   users()
 elif menu == "Perfil":
    profile()
