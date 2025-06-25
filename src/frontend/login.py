@@ -3,6 +3,9 @@ from bussines.user import authenticate
 from bussines.profile import get_profiles
 
 def login():
+    if "login_failed" not in st.session_state:
+        st.session_state.login_failed = False
+
     st.markdown("<h2 style='text-align: center;'>🔐 Bem-vindo ao KeyCore</h2>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center;'>Faça login para continuar</p>", unsafe_allow_html=True)
 
