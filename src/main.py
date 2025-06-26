@@ -5,6 +5,7 @@ from frontend.user import users
 from frontend.profile import profile
 from frontend.home import home
 from frontend.apidocs import api_docs
+from frontend.logout import logout
 
 # --- Inicializa sessão ---
 if "logged_in" not in st.session_state:
@@ -49,18 +50,4 @@ elif st.session_state.menu == "API Docs":
 elif st.session_state.menu == "Login":
     login()
 elif st.session_state.menu == "Logout":
-    st.markdown("## 🔒 Logout")
-    st.warning("Você realmente deseja sair?")
-
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("✅ Sim, quero sair"):
-            st.session_state.logged_in = False
-            st.session_state.username_logged = ""
-            st.success("Logout realizado com sucesso.")
-            st.session_state.menu = "Home"
-            st.rerun()
-    with col2:
-        if st.button("↩️ Cancelar"):
-            st.session_state.menu = "Home"
-            st.rerun()
+    logout()

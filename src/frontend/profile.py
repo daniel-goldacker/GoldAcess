@@ -45,7 +45,6 @@ def profile():
             else:
                 try:
                     add_profile(profile_name.strip(), generate_token, admin, visible)
-                    st.success("✅ Perfil criado com sucesso.")
                     st.session_state.clear_fields = True
                     st.rerun()
                 except Exception as e:
@@ -93,7 +92,6 @@ def profile():
             if col_save.button("💾 Salvar alterações", key=f"save_{profile.id}"):
                 try:
                     update_profile(profile.id, new_generate_token, new_admin, new_visible)
-                    st.success("✅ Alterações salvas com sucesso.")
                     st.session_state.edit_profile_id = None
                     st.rerun()
                 except Exception as e:

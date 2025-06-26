@@ -3,7 +3,6 @@ from bussines.user import add_user, update_user, delete_user, get_all_users
 from bussines.profile import get_all_profiles, get_profiles
 from config import ConfigParametersApplication, ConfigParametersAdmin
 
-
 def users():
     st.subheader("👤 Gerenciar Usuários")
 
@@ -13,7 +12,8 @@ def users():
         "password": "",
         "exp_minutes": ConfigParametersApplication.DEFAULT_EXP_MINUTES,
         "clear_fields": False,
-        "visible": True
+        "visible": True,
+        "active": True
     }
 
     for key, value in defaults.items():
@@ -27,6 +27,7 @@ def users():
         st.session_state.exp_minutes = ConfigParametersApplication.DEFAULT_EXP_MINUTES
         st.session_state.clear_fields = False
         st.session_state.visible = True
+        st.session_state.active = True
 
     # --- Formulário de Criação ---
     with st.expander("➕ Criar novo usuário"):
@@ -46,16 +47,17 @@ def users():
         selected_profile_id = profile_map[selected_label]
         if st.session_state.profile_logger == ConfigParametersAdmin.PROFILE_ADMIN:
             visible = st.checkbox("Visivel?", key=f"visible")
+            active = st.checkbox("Ativo?", key=f"active")
         else:
-            visible = True    
+            visible = True
+            active = True    
         
         if st.button("Criar"):
             if not username or not password:
                 st.warning("Usuário e senha são obrigatórios.")
             else:
                 try:
-                    add_user(username, password, exp_minutes, selected_profile_id, visible)
-                    st.success(f"✅ Usuário '{username}' criado com sucesso.")
+                    add_user(username, password, exp_minutes, selected_profile_id, visible, active)
                     st.session_state.clear_fields = True
                     st.rerun()
                 except Exception as e:
@@ -71,14 +73,18 @@ def users():
     profiles = get_all_profiles(st.session_state.profile_logger)
 
     for user in users:
-        profile =  get_profiles(user.profile_id)
-        col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 1, 1])
-        col1.markdown(f"**👤 {user.username}**")
-        col2.markdown(f"**🧩 {profile.name}**")
-        col3.markdown(f"🕒 Token: `{user.token_exp_minutes} min`")
+        profile = get_profiles(user.profile_id)
+        col1, col2, col3, col4, col5, col6 = st.columns([2, 2, 2, 1, 1, 1])
 
-        edit_clicked = col4.button("✏️", key=f"edit_{user.id}")
-        delete_clicked = col5.button("🗑️", key=f"delete_{user.id}")
+        col1.markdown(f"<div style='white-space: nowrap;'><strong>👤 {user.username}</strong></div>", unsafe_allow_html=True)
+        col2.markdown(f"<div style='white-space: nowrap;'><strong>🧩 {profile.name}</strong></div>", unsafe_allow_html=True)
+        col3.markdown(f"<div style='white-space: nowrap;'>🕒 Token: <code>{user.token_exp_minutes} min</code></div>", unsafe_allow_html=True)
+
+        ativo_status = "✅ Ativo" if user.active else "❌ Inativo"
+        col4.markdown(f"<div style='white-space: nowrap;'><strong>{ativo_status}</strong></div>", unsafe_allow_html=True)
+
+        edit_clicked = col5.button("✏️", key=f"edit_{user.id}")
+        delete_clicked = col6.button("🗑️", key=f"delete_{user.id}")
 
         if delete_clicked:
             try:
@@ -105,8 +111,10 @@ def users():
            
             if st.session_state.profile_logger == ConfigParametersAdmin.PROFILE_ADMIN:
                 new_visible = st.checkbox("Visivel?", key=f"visible_{user.id}", value=user.visible)
+                new_active = st.checkbox("Ativo?", key=f"active_{user.id}", value=user.active)
             else:
-                new_visible = True 
+                new_visible = True
+                new_active  = True 
             
             col_save, col_cancel = st.columns(2)
 
@@ -118,8 +126,9 @@ def users():
                     exp_alterado = new_exp_minutes != user.token_exp_minutes
                     perfil_alterado = new_profile_id != user.profile_id
                     visible_alterado = new_visible != user.visible
+                    active_alterado = new_active != user.active
 
-                    if not senha_alterada and not exp_alterado and not perfil_alterado and not visible_alterado:
+                    if not senha_alterada and not exp_alterado and not perfil_alterado and not visible_alterado and not active_alterado:
                         st.warning("⚠️ Nenhuma alteração feita.")
                     else:
                         update_user(
@@ -127,10 +136,10 @@ def users():
                             new_password=new_password_clean if senha_alterada else None,
                             new_token_exp_minutes=new_exp_minutes if exp_alterado else None,
                             new_profile_id=new_profile_id if perfil_alterado else None,
-                            new_visible=new_visible if visible_alterado else None
+                            new_visible=new_visible if visible_alterado else None,
+                            new_active=new_active if active_alterado else None
                         )
 
-                        st.success("✅ Alterações salvas com sucesso.")
                         st.session_state.edit_user_id = None
                         st.rerun()
                 except Exception as e:

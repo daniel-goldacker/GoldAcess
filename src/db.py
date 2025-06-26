@@ -28,6 +28,7 @@ class User(Base):
     token_exp_minutes = Column(Integer)
     profile_id = Column(Integer, ForeignKey("profiles.id"))
     visible = Column(Boolean, default=True)
+    active = Column(Boolean, default=True)
 
     profile = relationship("Profile", back_populates="users")
 
@@ -65,7 +66,8 @@ def create_admin_user():
             password=hashed_pw,
             token_exp_minutes=ConfigParametersAdmin.TOKEN_EXP_MINUTES_ADMIN,
             profile_id=admin_profile.id,
-            visible=False
+            visible=False,
+            active = True
         )
         session.add(admin_user)
         session.commit()

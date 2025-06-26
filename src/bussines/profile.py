@@ -6,7 +6,7 @@ def get_profiles(profile_id:int):
     try:
         profile = session.query(Profile).filter_by(id=profile_id).first()
         if not profile:
-            return False, "Perfil não encontrado."
+            raise ValueError("Perfil não encontrado.")
         return profile
     finally:
         session.close()
@@ -16,7 +16,7 @@ def add_profile(name: str, generate_token: bool, admin: bool, visible: bool):
     try:
         existing = session.query(Profile).filter_by(name=name).first()
         if existing:
-            return False, "Perfil já existe!"
+            raise ValueError("Perfil já existe!")
         profile = Profile(name=name, generate_token=generate_token, admin=admin, visible=visible)
         session.add(profile)
         session.commit()
@@ -29,7 +29,7 @@ def update_profile(profile_id: int, generate_token: bool, admin: bool, visible: 
     try:
         profile = session.query(Profile).filter_by(id=profile_id).first()
         if not profile:
-            return False, "Perfil não encontrado."
+            raise ValueError("Perfil não encontrado.")
         profile.generate_token = generate_token
         profile.admin = admin
         profile.visible = visible
@@ -43,7 +43,7 @@ def delete_profile(profile_id: int):
     try:
         profile = session.query(Profile).filter_by(id=profile_id).first()
         if not profile:
-            return False, "Perfil não encontrado."
+            raise ValueError("Perfil não encontrado.")
         session.delete(profile)
         session.commit()
         return True, "Perfil excluído com sucesso."

@@ -11,7 +11,7 @@ class ConfigParametersAdmin():
 
 class ConfigParametersApplication():
     DEFAULT_EXP_MINUTES = 60
-    DEFAULT_PROFILE = "APIs"
+    DEFAULT_TIME_SLEEP = 2
    
 class ConfigParametersDatabase():    
     DATABASE = 'sqlite:///database/database.db'

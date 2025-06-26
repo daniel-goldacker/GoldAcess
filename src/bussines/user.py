@@ -4,12 +4,12 @@ from sqlalchemy.orm import joinedload
 from typing import Optional
 from config import ConfigParametersAdmin
 
-def add_user(username: str, password: str, token_exp_minutes: int, profile_id: int, visible: bool):
+def add_user(username: str, password: str, token_exp_minutes: int, profile_id: int, visible: bool, active: bool):
     session = SessionLocal()
     try: 
         existing = session.query(User).filter_by(username=username).first()
         if existing:
-            return False, "Perfil já existe!"
+           raise ValueError("Usuário já existente!")
     
         hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
         
@@ -18,7 +18,8 @@ def add_user(username: str, password: str, token_exp_minutes: int, profile_id: i
             password=hashed_pw,
             token_exp_minutes=token_exp_minutes,
             profile_id=profile_id,
-            visible=visible
+            visible=visible,
+            active=active
         )
         
         session.add(user)
@@ -31,12 +32,13 @@ def add_user(username: str, password: str, token_exp_minutes: int, profile_id: i
 def update_user(user_id: int, new_password: Optional[str] = None,
                      new_token_exp_minutes: Optional[int] = None,
                      new_profile_id: Optional[int] = None,
-                     new_visible: Optional[bool] = None):
+                     new_visible: Optional[bool] = None,
+                     new_active: Optional[bool] = None,):
     session = SessionLocal()
     try:
         user = session.query(User).filter_by(id=user_id).first()
         if not user:
-            return False, "Usuário não encontrado."
+            raise ValueError("Usuário não encontrado.")
 
         if new_password:
             hashed_pw = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
@@ -47,8 +49,12 @@ def update_user(user_id: int, new_password: Optional[str] = None,
 
         if new_profile_id is not None:
             user.profile_id = new_profile_id
+
         if new_visible is not None:
             user.visible = new_visible
+
+        if new_active is not None:
+            user.active = new_active
 
         session.commit()
         return True, "Usuário atualizado com sucesso."
@@ -61,7 +67,7 @@ def delete_user(user_id: int):
     try:
         user = session.query(User).filter(User.id == user_id).first()
         if not user:
-            return False, "Usuário não encontrado."
+            raise ValueError("Usuário não encontrado.")
         
         session.delete(user)
         session.commit()
@@ -75,7 +81,7 @@ def get_all_users(profile_logged: str):
         if profile_logged == ConfigParametersAdmin.PROFILE_ADMIN: 
             users = session.query(User).options(joinedload(User.profile)).all()
         else:    
-           users = session.query(User).options(joinedload(User.profile)).filter(User.visible == True).all()
+            users = session.query(User).options(joinedload(User.profile)).filter(User.visible == True).all()
 
         return users
     finally:
