@@ -9,10 +9,10 @@ def profile():
     defaults = {
         "profile_name": "",
         "generate_token": False,
-        "admin": False,
+        "is_admin": False,
         "clear_fields": False,
         "edit_profile_id": None,
-        "visible": True
+        "is_visible": True
     }
 
     for key, value in defaults.items():
@@ -22,8 +22,8 @@ def profile():
     if st.session_state.get("clear_fields", True):
         st.session_state.profile_name = ""
         st.session_state.generate_token = False
-        st.session_state.admin = False
-        st.session_state.visible = True
+        st.session_state.is_admin = False
+        st.session_state.is_visible = True
         st.session_state.clear_fields = False
 
 
@@ -31,12 +31,12 @@ def profile():
     with st.expander("➕ Criar novo perfil"):
         profile_name = st.text_input("Nome do Perfil", key="profile_name")
         generate_token = st.checkbox("Pode gerar token?", key="generate_token")
-        admin = st.checkbox("É administrador?", key="admin")
+        is_admin = st.checkbox("É administrador?", key="is_admin")
 
         if st.session_state.profile_logger == ConfigParametersAdmin.PROFILE_ADMIN:
-            visible = st.checkbox("Visivel ?", key="visible")
+            is_visible = st.checkbox("Visivel ?", key="is_visible")
         else:
-            visible = True 
+            is_visible = True 
         
 
         if st.button("Criar"):
@@ -44,7 +44,7 @@ def profile():
                 st.warning("⚠️ O nome do perfil é obrigatório.")
             else:
                 try:
-                    add_profile(profile_name.strip(), generate_token, admin, visible)
+                    add_profile(profile_name.strip(), generate_token, is_admin, is_visible)
                     st.session_state.clear_fields = True
                     st.rerun()
                 except Exception as e:
@@ -59,7 +59,7 @@ def profile():
         col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 1, 1]) 
         col1.markdown(f"**🧩 {profile.name}**")
         col2.markdown(f"**{'🔑 Gera token' if profile.generate_token else '❌ Não gera token'}**")
-        col3.markdown( f"**{'👑 Admin' if profile.admin else '👤 Padrão'}**")
+        col3.markdown( f"**{'👑 Admin' if profile.is_admin else '👤 Padrão'}**")
         edit_clicked = col4.button("✏️", key=f"edit_{profile.id}")
         delete_clicked = col5.button("🗑️", key=f"delete_{profile.id}")
 
@@ -80,18 +80,18 @@ def profile():
             st.markdown(f"### ✏️ Editar perfil: `{profile.name}`")
 
             new_generate_token = st.checkbox("Pode gerar token?", value=profile.generate_token, key=f"token_{profile.id}")
-            new_admin = st.checkbox("É administrador?", value=profile.admin, key=f"admin_{profile.id}")
+            new_is_admin = st.checkbox("É administrador?", value=profile.is_admin, key=f"is_admin_{profile.id}")
             
             if st.session_state.profile_logger == ConfigParametersAdmin.PROFILE_ADMIN:
-                new_visible = st.checkbox("Visivel?", value=profile.visible, key=f"visible_{profile.id}")
+                new_is_visible = st.checkbox("Visivel?", value=profile.is_visible, key=f"is_visible_{profile.id}")
             else:
-                new_visible = True 
+                new_is_visible = True 
                 
             col_save, col_cancel = st.columns(2)
 
             if col_save.button("💾 Salvar alterações", key=f"save_{profile.id}"):
                 try:
-                    update_profile(profile.id, new_generate_token, new_admin, new_visible)
+                    update_profile(profile.id, new_generate_token, new_is_admin, new_is_visible)
                     st.session_state.edit_profile_id = None
                     st.rerun()
                 except Exception as e:

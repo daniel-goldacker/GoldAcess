@@ -13,8 +13,8 @@ class Profile(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True)
     generate_token = Column(Boolean, default=False)
-    admin = Column(Boolean, default=False)
-    visible = Column(Boolean, default=True)
+    is_admin = Column(Boolean, default=False)
+    is_visible = Column(Boolean, default=True)
     
     users = relationship("User", back_populates="profile")
 
@@ -27,8 +27,8 @@ class User(Base):
     password = Column(LargeBinary)
     token_exp_minutes = Column(Integer)
     profile_id = Column(Integer, ForeignKey("profiles.id"))
-    visible = Column(Boolean, default=True)
-    active = Column(Boolean, default=True)
+    is_visible = Column(Boolean, default=True)
+    is_active = Column(Boolean, default=True)
 
     profile = relationship("Profile", back_populates="users")
 
@@ -40,36 +40,37 @@ SessionLocal = sessionmaker(bind=engine)
 # Criar perfis
 def create_profiles():
     session = SessionLocal()
-    admin_profile = session.query(Profile).filter_by(name=ConfigParametersAdmin.PROFILE_ADMIN).first()
-    if not admin_profile:
-        admin_profile = Profile(
+    is_admin_profile = session.query(Profile).filter_by(name=ConfigParametersAdmin.PROFILE_ADMIN).first()
+    if not is_admin_profile:
+        is_admin_profile = Profile(
             name=ConfigParametersAdmin.PROFILE_ADMIN,
             generate_token=False,
-            admin=True,
-            visible=False
+            is_admin=True,
+            is_visible=False
         )
-        session.add(admin_profile)
+        session.add(is_admin_profile)
         session.commit()
     session.close()
+    
 
 # Criar usuário admin
 def create_admin_user():
     session = SessionLocal()
     create_profiles()
-    admin_profile = session.query(Profile).filter_by(name=ConfigParametersAdmin.PROFILE_ADMIN).first()
+    is_admin_profile = session.query(Profile).filter_by(name=ConfigParametersAdmin.PROFILE_ADMIN).first()
 
-    admin = session.query(User).filter_by(username=ConfigParametersAdmin.NAME_ADMIN).first()
-    if not admin:
+    is_admin = session.query(User).filter_by(username=ConfigParametersAdmin.NAME_ADMIN).first()
+    if not is_admin:
         hashed_pw = bcrypt.hashpw(ConfigParametersAdmin.PASSWORD_ADMIN.encode(), bcrypt.gensalt())
-        admin_user = User(
+        is_admin_user = User(
             username=ConfigParametersAdmin.NAME_ADMIN,
             password=hashed_pw,
             token_exp_minutes=ConfigParametersAdmin.TOKEN_EXP_MINUTES_ADMIN,
-            profile_id=admin_profile.id,
-            visible=False,
-            active = True
+            profile_id=is_admin_profile.id,
+            is_visible=False,
+            is_active = True
         )
-        session.add(admin_user)
+        session.add(is_admin_user)
         session.commit()
     session.close()
 

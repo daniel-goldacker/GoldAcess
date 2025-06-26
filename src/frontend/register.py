@@ -23,8 +23,8 @@ def register():
                     password=new_password,
                     token_exp_minutes=ConfigParametersApplication.DEFAULT_EXP_MINUTES,
                     profile_id=2,  # Perfil padrão (ex: pendente)
-                    visible=True,
-                    active=False 
+                    is_visible=True,
+                    is_active=False 
                 )
                 st.success("✅ Cadastro enviado! Aguarde liberação de um administrador.")
                 time_sleep()

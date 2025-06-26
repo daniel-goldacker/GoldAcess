@@ -12,8 +12,8 @@ def users():
         "password": "",
         "exp_minutes": ConfigParametersApplication.DEFAULT_EXP_MINUTES,
         "clear_fields": False,
-        "visible": True,
-        "active": True
+        "is_visible": True,
+        "is_active": True
     }
 
     for key, value in defaults.items():
@@ -26,8 +26,8 @@ def users():
         st.session_state.password = ""
         st.session_state.exp_minutes = ConfigParametersApplication.DEFAULT_EXP_MINUTES
         st.session_state.clear_fields = False
-        st.session_state.visible = True
-        st.session_state.active = True
+        st.session_state.is_visible = True
+        st.session_state.is_active = True
 
     # --- Formulário de Criação ---
     with st.expander("➕ Criar novo usuário"):
@@ -46,18 +46,18 @@ def users():
         selected_label = st.selectbox("Perfil do usuário", options=list(profile_map.keys()))
         selected_profile_id = profile_map[selected_label]
         if st.session_state.profile_logger == ConfigParametersAdmin.PROFILE_ADMIN:
-            visible = st.checkbox("Visivel?", key=f"visible")
-            active = st.checkbox("Ativo?", key=f"active")
+            is_visible = st.checkbox("Visivel?", key=f"is_visible")
+            is_active = st.checkbox("Ativo?", key=f"is_active")
         else:
-            visible = True
-            active = True    
+            is_visible = True
+            is_active = True    
         
         if st.button("Criar"):
             if not username or not password:
                 st.warning("Usuário e senha são obrigatórios.")
             else:
                 try:
-                    add_user(username, password, exp_minutes, selected_profile_id, visible, active)
+                    add_user(username, password, exp_minutes, selected_profile_id, is_visible, is_active)
                     st.session_state.clear_fields = True
                     st.rerun()
                 except Exception as e:
@@ -80,7 +80,7 @@ def users():
         col2.markdown(f"<div style='white-space: nowrap;'><strong>🧩 {profile.name}</strong></div>", unsafe_allow_html=True)
         col3.markdown(f"<div style='white-space: nowrap;'>🕒 Token: <code>{user.token_exp_minutes} min</code></div>", unsafe_allow_html=True)
 
-        ativo_status = "✅ Ativo" if user.active else "❌ Inativo"
+        ativo_status = "✅ Ativo" if user.is_active else "❌ Inativo"
         col4.markdown(f"<div style='white-space: nowrap;'><strong>{ativo_status}</strong></div>", unsafe_allow_html=True)
 
         edit_clicked = col5.button("✏️", key=f"edit_{user.id}")
@@ -110,11 +110,11 @@ def users():
             new_profile_id = new_profile_map[new_profile_label]
            
             if st.session_state.profile_logger == ConfigParametersAdmin.PROFILE_ADMIN:
-                new_visible = st.checkbox("Visivel?", key=f"visible_{user.id}", value=user.visible)
-                new_active = st.checkbox("Ativo?", key=f"active_{user.id}", value=user.active)
+                new_is_visible = st.checkbox("Visivel?", key=f"is_visible_{user.id}", value=user.is_visible)
+                new_is_active = st.checkbox("Ativo?", key=f"is_active_{user.id}", value=user.is_active)
             else:
-                new_visible = True
-                new_active  = True 
+                new_is_visible = True
+                new_is_active  = True 
             
             col_save, col_cancel = st.columns(2)
 
@@ -125,10 +125,10 @@ def users():
                     senha_alterada = bool(new_password_clean)
                     exp_alterado = new_exp_minutes != user.token_exp_minutes
                     perfil_alterado = new_profile_id != user.profile_id
-                    visible_alterado = new_visible != user.visible
-                    active_alterado = new_active != user.active
+                    is_visible_alterado = new_is_visible != user.is_visible
+                    is_active_alterado = new_is_active != user.is_active
 
-                    if not senha_alterada and not exp_alterado and not perfil_alterado and not visible_alterado and not active_alterado:
+                    if not senha_alterada and not exp_alterado and not perfil_alterado and not is_visible_alterado and not is_active_alterado:
                         st.warning("⚠️ Nenhuma alteração feita.")
                     else:
                         update_user(
@@ -136,8 +136,8 @@ def users():
                             new_password=new_password_clean if senha_alterada else None,
                             new_token_exp_minutes=new_exp_minutes if exp_alterado else None,
                             new_profile_id=new_profile_id if perfil_alterado else None,
-                            new_visible=new_visible if visible_alterado else None,
-                            new_active=new_active if active_alterado else None
+                            new_is_visible=new_is_visible if is_visible_alterado else None,
+                            new_is_active=new_is_active if is_active_alterado else None
                         )
 
                         st.session_state.edit_user_id = None

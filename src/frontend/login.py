@@ -22,7 +22,7 @@ def login():
             user = authenticate(login_user, login_pass)
             if user:
                 profile = get_profiles(user.profile_id)
-                if profile.admin:
+                if profile.is_admin:
                     st.session_state.logged_in = True
                     st.session_state.user = user
                     st.session_state.username_logged = user.username

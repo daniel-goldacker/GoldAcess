@@ -4,7 +4,7 @@ from sqlalchemy.orm import joinedload
 from typing import Optional
 from config import ConfigParametersAdmin
 
-def add_user(username: str, password: str, token_exp_minutes: int, profile_id: int, visible: bool, active: bool):
+def add_user(username: str, password: str, token_exp_minutes: int, profile_id: int, is_visible: bool, is_active: bool):
     session = SessionLocal()
     try: 
         existing = session.query(User).filter_by(username=username).first()
@@ -18,8 +18,8 @@ def add_user(username: str, password: str, token_exp_minutes: int, profile_id: i
             password=hashed_pw,
             token_exp_minutes=token_exp_minutes,
             profile_id=profile_id,
-            visible=visible,
-            active=active
+            is_visible=is_visible,
+            is_active=is_active
         )
         
         session.add(user)
@@ -30,10 +30,10 @@ def add_user(username: str, password: str, token_exp_minutes: int, profile_id: i
 
 
 def update_user(user_id: int, new_password: Optional[str] = None,
-                     new_token_exp_minutes: Optional[int] = None,
-                     new_profile_id: Optional[int] = None,
-                     new_visible: Optional[bool] = None,
-                     new_active: Optional[bool] = None,):
+                new_token_exp_minutes: Optional[int] = None,
+                new_profile_id: Optional[int] = None,
+                new_is_visible: Optional[bool] = None,
+                new_is_active: Optional[bool] = None,):
     session = SessionLocal()
     try:
         user = session.query(User).filter_by(id=user_id).first()
@@ -50,11 +50,11 @@ def update_user(user_id: int, new_password: Optional[str] = None,
         if new_profile_id is not None:
             user.profile_id = new_profile_id
 
-        if new_visible is not None:
-            user.visible = new_visible
+        if new_is_visible is not None:
+            user.is_visible = new_is_visible
 
-        if new_active is not None:
-            user.active = new_active
+        if new_is_active is not None:
+            user.is_active = new_is_active
 
         session.commit()
         return True, "Usuário atualizado com sucesso."
