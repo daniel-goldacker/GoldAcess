@@ -81,7 +81,7 @@ def get_all_users(profile_logged: str):
         if profile_logged == ConfigParametersAdmin.PROFILE_ADMIN: 
             users = session.query(User).options(joinedload(User.profile)).all()
         else:    
-            users = session.query(User).options(joinedload(User.profile)).filter(User.visible == True).all()
+            users = session.query(User).options(joinedload(User.profile)).filter(User.is_visible == True).all()
 
         return users
     finally:

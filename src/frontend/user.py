@@ -106,7 +106,13 @@ def users():
             new_exp_minutes = st.number_input("⏱️ Novo tempo de expiração (minutos)", min_value=0, value=user.token_exp_minutes, key=f"exp_{user.id}")
 
             new_profile_map = {p.name: p.id for p in profiles}
-            new_profile_label = st.selectbox("Perfil do usuário", options=list(new_profile_map.keys()), key=f"profile_{user.id}")
+            current_profile_name = next((p.name for p in profiles if p.id == user.profile_id), None)
+            new_profile_label = st.selectbox(
+                                                "Perfil do usuário",
+                                                options=list(new_profile_map.keys()),
+                                                index=list(new_profile_map.keys()).index(current_profile_name) if current_profile_name else 0,
+                                                key=f"profile_{user.id}"
+                                            )
             new_profile_id = new_profile_map[new_profile_label]
            
             if st.session_state.profile_logger == ConfigParametersAdmin.PROFILE_ADMIN:

@@ -56,7 +56,7 @@ def get_all_profiles(profile_logged: str):
         if profile_logged == ConfigParametersAdmin.PROFILE_ADMIN: 
             profiles = session.query(Profile).all()  
         else:     
-            profiles = session.query(Profile).filter(Profile.visible == True).all()    
+            profiles = session.query(Profile).filter(Profile.is_visible == True).all()    
         
         return profiles
     finally:

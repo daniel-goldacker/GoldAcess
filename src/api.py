@@ -10,19 +10,25 @@ app = FastAPI()
 def api_auth(username: str = Form(...), password: str = Form(...)):
     user = authenticate(username, password)
     if user:
-        profile = get_profiles(user.profile_id)
+        if user.is_active: 
+            profile = get_profiles(user.profile_id)
 
-        if profile.generate_token:
-            token = generate_token(user)
-            return JSONResponse(
-                status_code=status.HTTP_200_OK,
-                content={"status": "ok", "token": token}
-            )
-        else:
+            if profile.generate_token:
+                token = generate_token(user)
+                return JSONResponse(
+                    status_code=status.HTTP_200_OK,
+                    content={"status": "ok", "token": token}
+                )
+            else:
+                return JSONResponse(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    content={"status": "fail", "message": "Usuário não liberado para solicitação de tokens"}
+                )
+        else: 
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                content={"status": "fail", "message": "Usuário não liberdo para solicitação de tokens"}
-            )
+                content={"status": "fail", "message": "Usuário ainda não está liberado! Aguarde liberação de um administrador."}
+            )                
 
     return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
