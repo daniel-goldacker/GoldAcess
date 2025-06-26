@@ -1,6 +1,6 @@
 import streamlit as st
 from bussines.profile import get_all_profiles, add_profile, update_profile, delete_profile
-from config import ConfigParametersAdmin
+from config import ConfigParametersApplication
 
 def profile():
     st.subheader("🧩 Gerenciar Perfis")
@@ -33,7 +33,7 @@ def profile():
         generate_token = st.checkbox("Pode gerar token?", key="generate_token")
         is_admin = st.checkbox("É administrador?", key="is_admin")
 
-        if st.session_state.profile_logger == ConfigParametersAdmin.PROFILE_ADMIN:
+        if st.session_state.profile_logger == ConfigParametersApplication.PROFILE_SISTEMA:
             is_visible = st.checkbox("Visivel ?", key="is_visible")
         else:
             is_visible = True 
@@ -60,8 +60,14 @@ def profile():
         col1.markdown(f"**🧩 {profile.name}**")
         col2.markdown(f"**{'🔑 Gera token' if profile.generate_token else '❌ Não gera token'}**")
         col3.markdown( f"**{'👑 Admin' if profile.is_admin else '👤 Padrão'}**")
-        edit_clicked = col4.button("✏️", key=f"edit_{profile.id}")
-        delete_clicked = col5.button("🗑️", key=f"delete_{profile.id}")
+
+
+        if profile.name in (ConfigParametersApplication.PROFILE_PADRAO, ConfigParametersApplication.PROFILE_SISTEMA):
+            edit_clicked = col4.button("✏️", key=f"edit_{profile.id}", disabled=True)
+            delete_clicked = col5.button("🗑️", key=f"delete_{profile.id}", disabled=True)
+        else:  
+            edit_clicked = col4.button("✏️", key=f"edit_{profile.id}")
+            delete_clicked = col5.button("🗑️", key=f"delete_{profile.id}")
 
         if delete_clicked:
             try:
@@ -82,7 +88,7 @@ def profile():
             new_generate_token = st.checkbox("Pode gerar token?", value=profile.generate_token, key=f"token_{profile.id}")
             new_is_admin = st.checkbox("É administrador?", value=profile.is_admin, key=f"is_admin_{profile.id}")
             
-            if st.session_state.profile_logger == ConfigParametersAdmin.PROFILE_ADMIN:
+            if st.session_state.profile_logger == ConfigParametersApplication.PROFILE_SISTEMA:
                 new_is_visible = st.checkbox("Visivel?", value=profile.is_visible, key=f"is_visible_{profile.id}")
             else:
                 new_is_visible = True 

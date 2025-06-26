@@ -2,7 +2,7 @@ import bcrypt
 from db import SessionLocal, User
 from sqlalchemy.orm import joinedload
 from typing import Optional
-from config import ConfigParametersAdmin
+from config import ConfigParametersApplication
 
 def add_user(username: str, password: str, token_exp_minutes: int, profile_id: int, is_visible: bool, is_active: bool):
     session = SessionLocal()
@@ -78,7 +78,7 @@ def delete_user(user_id: int):
 def get_all_users(profile_logged: str):
     session = SessionLocal()
     try:
-        if profile_logged == ConfigParametersAdmin.PROFILE_ADMIN: 
+        if profile_logged == ConfigParametersApplication.PROFILE_SISTEMA: 
             users = session.query(User).options(joinedload(User.profile)).all()
         else:    
             users = session.query(User).options(joinedload(User.profile)).filter(User.is_visible == True).all()

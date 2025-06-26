@@ -1,5 +1,6 @@
 import streamlit as st
 from bussines.user import add_user
+from bussines.profile import get_default_profile
 from util import time_sleep
 from config import ConfigParametersApplication
 
@@ -18,11 +19,12 @@ def register():
             st.warning("As senhas não coincidem. Tente novamente.")
         else:
             try:
+    
                 add_user(
                     username=new_username,
                     password=new_password,
-                    token_exp_minutes=ConfigParametersApplication.DEFAULT_EXP_MINUTES,
-                    profile_id=2,  # Perfil padrão (ex: pendente)
+                    token_exp_minutes=ConfigParametersApplication.TOKEN_EXP_MINUTES_AUTOMATIC_USER_CREATION,
+                    profile_id=get_default_profile(),
                     is_visible=True,
                     is_active=False 
                 )

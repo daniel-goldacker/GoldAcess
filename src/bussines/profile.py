@@ -1,5 +1,5 @@
 from db import SessionLocal, Profile
-from config import ConfigParametersAdmin
+from config import ConfigParametersApplication
 
 def get_profiles(profile_id:int):
     session = SessionLocal()
@@ -53,7 +53,7 @@ def delete_profile(profile_id: int):
 def get_all_profiles(profile_logged: str):
     session = SessionLocal()
     try:
-        if profile_logged == ConfigParametersAdmin.PROFILE_ADMIN: 
+        if profile_logged == ConfigParametersApplication.PROFILE_SISTEMA: 
             profiles = session.query(Profile).all()  
         else:     
             profiles = session.query(Profile).filter(Profile.is_visible == True).all()    
@@ -62,4 +62,12 @@ def get_all_profiles(profile_logged: str):
     finally:
         session.close()
 
+def get_default_profile():
+    session = SessionLocal()
+    try:
+        is_default_profile = session.query(Profile).filter_by(name=ConfigParametersApplication.PROFILE_PADRAO).first()
+
+        return is_default_profile.id   
+    finally:
+        session.close()
  

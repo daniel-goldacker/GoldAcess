@@ -10,7 +10,7 @@ def users():
     defaults = {
         "username": "",
         "password": "",
-        "exp_minutes": ConfigParametersApplication.DEFAULT_EXP_MINUTES,
+        "exp_minutes": ConfigParametersApplication.TOKEN_EXP_MINUTES_NEW_USER,
         "clear_fields": False,
         "is_visible": True,
         "is_active": True
@@ -24,7 +24,7 @@ def users():
     if st.session_state.get("clear_fields", True):
         st.session_state.username = ""
         st.session_state.password = ""
-        st.session_state.exp_minutes = ConfigParametersApplication.DEFAULT_EXP_MINUTES
+        st.session_state.exp_minutes = ConfigParametersApplication.TOKEN_EXP_MINUTES_NEW_USER
         st.session_state.clear_fields = False
         st.session_state.is_visible = True
         st.session_state.is_active = True
@@ -45,7 +45,7 @@ def users():
         profile_map = {p.name: p.id for p in profiles}
         selected_label = st.selectbox("Perfil do usuário", options=list(profile_map.keys()))
         selected_profile_id = profile_map[selected_label]
-        if st.session_state.profile_logger == ConfigParametersAdmin.PROFILE_ADMIN:
+        if st.session_state.profile_logger == ConfigParametersApplication.PROFILE_SISTEMA:
             is_visible = st.checkbox("Visivel?", key=f"is_visible")
             is_active = st.checkbox("Ativo?", key=f"is_active")
         else:
@@ -83,8 +83,12 @@ def users():
         ativo_status = "✅ Ativo" if user.is_active else "❌ Inativo"
         col4.markdown(f"<div style='white-space: nowrap;'><strong>{ativo_status}</strong></div>", unsafe_allow_html=True)
 
-        edit_clicked = col5.button("✏️", key=f"edit_{user.id}")
-        delete_clicked = col6.button("🗑️", key=f"delete_{user.id}")
+        if (ConfigParametersAdmin.NAME_ADMIN == user.username):
+            edit_clicked = col5.button("✏️", key=f"edit_{user.id}", disabled=True)
+            delete_clicked = col6.button("🗑️", key=f"delete_{user.id}", disabled=True)
+        else:    
+            edit_clicked = col5.button("✏️", key=f"edit_{user.id}")
+            delete_clicked = col6.button("🗑️", key=f"delete_{user.id}")
 
         if delete_clicked:
             try:
@@ -115,7 +119,7 @@ def users():
                                             )
             new_profile_id = new_profile_map[new_profile_label]
            
-            if st.session_state.profile_logger == ConfigParametersAdmin.PROFILE_ADMIN:
+            if st.session_state.profile_logger == ConfigParametersApplication.PROFILE_SISTEMA:
                 new_is_visible = st.checkbox("Visivel?", key=f"is_visible_{user.id}", value=user.is_visible)
                 new_is_active = st.checkbox("Ativo?", key=f"is_active_{user.id}", value=user.is_active)
             else:

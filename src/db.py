@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, create_engine, LargeBinary
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
-from config import ConfigParametersAdmin, ConfigParametersDatabase
+from config import ConfigParametersAdmin, ConfigParametersDatabase, ConfigParametersApplication
 import bcrypt
 
 Base = declarative_base()
@@ -40,15 +40,24 @@ SessionLocal = sessionmaker(bind=engine)
 # Criar perfis
 def create_profiles():
     session = SessionLocal()
-    is_admin_profile = session.query(Profile).filter_by(name=ConfigParametersAdmin.PROFILE_ADMIN).first()
+    is_admin_profile = session.query(Profile).filter_by(name=ConfigParametersApplication.PROFILE_SISTEMA).first()
     if not is_admin_profile:
         is_admin_profile = Profile(
-            name=ConfigParametersAdmin.PROFILE_ADMIN,
+            name=ConfigParametersApplication.PROFILE_SISTEMA,
             generate_token=False,
             is_admin=True,
             is_visible=False
         )
         session.add(is_admin_profile)
+
+        is_default_profile = Profile(
+            name=ConfigParametersApplication.PROFILE_PADRAO,
+            generate_token=False,
+            is_admin=False,
+            is_visible=False
+        )
+        session.add(is_default_profile)
+
         session.commit()
     session.close()
     
@@ -56,8 +65,7 @@ def create_profiles():
 # Criar usuário admin
 def create_admin_user():
     session = SessionLocal()
-    create_profiles()
-    is_admin_profile = session.query(Profile).filter_by(name=ConfigParametersAdmin.PROFILE_ADMIN).first()
+    is_admin_profile = session.query(Profile).filter_by(name=ConfigParametersApplication.PROFILE_SISTEMA).first()
 
     is_admin = session.query(User).filter_by(username=ConfigParametersAdmin.NAME_ADMIN).first()
     if not is_admin:
@@ -75,4 +83,5 @@ def create_admin_user():
     session.close()
 
 # Executa na inicialização
+create_profiles()
 create_admin_user()
