@@ -33,7 +33,6 @@ with st.sidebar:
         if st.session_state.menu in menu_items else 0
     )
 
-# --- Evita sobrescrever quando menu foi alterado manualmente (ex: via botão "Cancelar") ---
 if selected != st.session_state.menu:
     st.session_state.menu = selected
     st.rerun()

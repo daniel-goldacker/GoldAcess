@@ -7,7 +7,7 @@ def login():
     if "login_failed" not in st.session_state:
         st.session_state.login_failed = False
 
-    st.markdown("<h2 style='text-align: center;'>🔐 Bem-vindo ao KeyCore</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center;'>🔐 Bem-vindo ao GoldCo</h2>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center;'>Faça login para continuar</p>", unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -35,7 +35,7 @@ def login():
                 st.session_state.login_failed = True
 
         if col_create.button("📝 Criar Conta"):
-            register()  # Abre o dialog nativo
+            register()
 
         if st.session_state.login_failed:
             st.error("❌ Usuário ou senha inválidos, ou seu perfil não está autorizado a acessar o sistema.")

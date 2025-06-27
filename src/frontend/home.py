@@ -1,10 +1,24 @@
 import streamlit as st
+from util import get_image_base64
 
 def home():
-    st.title("🔐 Bem-vindo ao KeyCore")
-    st.markdown("""
-    ### Gerencie acessos com segurança e eficiência
-    O **KeyCore** é sua central de controle de autenticação e autorização de usuários, oferecendo uma interface intuitiva para administração de:
+    image_base64 = get_image_base64("img/GoldCo.png")
+    
+    st.markdown(
+    "<h3 style='text-align: center;'>Gerencie acessos com segurança e eficiência</h3>",
+    unsafe_allow_html=True)
+
+    st.markdown(
+        f"""
+        <div style='text-align: center; padding: 5px 0 10px 0;'>
+            <img src="data:image/png;base64,{image_base64}" alt="GoldCo Logo" width="300"/>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.markdown("""    
+    O **GoldCo Autenticação** é sua central de controle de autenticação e autorização de usuários, oferecendo uma interface intuitiva para administração de:
     
     - 👤 **Usuários**
     - 🛡️ **Perfis de acesso**
