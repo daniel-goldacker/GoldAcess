@@ -1,8 +1,8 @@
+import os
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, create_engine, LargeBinary
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
-from config import ConfigParametersAdmin, ConfigParametersDatabase, ConfigParametersApplication
-import bcrypt
+from config import ConfigParametersDatabase
 
 Base = declarative_base()
 
@@ -31,6 +31,7 @@ class User(Base):
     profile = relationship("Profile", back_populates="users")
 
 # Configuração e criação das tabelas
-engine = create_engine(ConfigParametersDatabase.DATABASE)
+os.makedirs(ConfigParametersDatabase.LOCAL_DB, exist_ok=True)
+engine = create_engine(ConfigParametersDatabase.URI_CONNECTION)
 Base.metadata.create_all(bind=engine)
 SessionLocal = sessionmaker(bind=engine)

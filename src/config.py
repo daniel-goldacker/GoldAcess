@@ -16,7 +16,8 @@ class ConfigParametersApplication():
     DEFAULT_TIME_SLEEP = 2
    
 class ConfigParametersDatabase():    
-    DATABASE = 'sqlite:///database/database.db'
+    LOCAL_DB = 'database'
+    URI_CONNECTION = f'sqlite:///{LOCAL_DB}/database.db'
 
 class ConfigParametersSecurity():
     SECRET_KEY = os.getenv('SECRET_KEY')

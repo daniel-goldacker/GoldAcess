@@ -8,6 +8,15 @@ from frontend.apidocs import api_docs
 from frontend.logout import logout
 from bussines.profile import create_default_profiles
 from bussines.user import create_user_admin
+from PIL import Image
+
+icon = Image.open("img/GoldCo.ico")
+
+st.set_page_config(
+    page_title="GoldCo. Autenticação",
+    page_icon=icon,
+    layout="centered"
+)
 
 # --- Inicializa sessão ---
 if "logged_in" not in st.session_state:
