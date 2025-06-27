@@ -31,12 +31,18 @@ create_user_admin()
 
 # --- MENU LATERAL ---
 with st.sidebar:
+
     if st.session_state.logged_in:
         menu_items = ["Home", "Usuário", "Perfil", "API Docs", "Logout"]
         icons = ["house", "person-plus", "people", "book", "box-arrow-right"]
     else:
         menu_items = ["Home", "API Docs", "Login"]
         icons = ["house", "book", "box-arrow-in-right"]
+
+    if st.session_state.username_logged:
+        st.markdown(f"👋 Bem vindo, **{st.session_state.username_logged}**!")
+    else: 
+        st.markdown("🙅‍♂️ Nenhum usuário logado.")    
 
     selected = option_menu(
         "Menu",
