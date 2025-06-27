@@ -6,7 +6,6 @@ from config import ConfigParametersApplication, ConfigParametersAdmin
 def users():
     st.subheader("👤 Gerenciar Usuários")
 
-    # Valores padrão dos campos
     defaults = {
         "username": "",
         "password": "",
@@ -20,7 +19,6 @@ def users():
         if key not in st.session_state:
             st.session_state[key] = value
 
-    # Reset após criação
     if st.session_state.get("clear_fields", True):
         st.session_state.username = ""
         st.session_state.password = ""
@@ -29,13 +27,11 @@ def users():
         st.session_state.is_visible = True
         st.session_state.is_active = True
 
-    # --- Formulário de Criação ---
     with st.expander("➕ Criar novo usuário"):
         username = st.text_input("Usuário", key="username")
         password = st.text_input("Senha", type="password", key="password")
         exp_minutes = st.number_input("Minutos até expiração do token", min_value=0, key="exp_minutes")
                
-        # Buscar perfis
         profiles = get_all_profiles(st.session_state.profile_logger)
 
         if not profiles:
@@ -74,8 +70,8 @@ def users():
 
     for user in users:
         profile = get_profiles(user.profile_id)
+        
         col1, col2, col3, col4, col5, col6 = st.columns([2, 2, 2, 1, 1, 1])
-
         col1.markdown(f"<div style='white-space: nowrap;'><strong>👤 {user.username}</strong></div>", unsafe_allow_html=True)
         col2.markdown(f"<div style='white-space: nowrap;'><strong>🧩 {profile.name}</strong></div>", unsafe_allow_html=True)
         col3.markdown(f"<div style='white-space: nowrap;'>🕒 Token: <code>{user.token_exp_minutes} min</code></div>", unsafe_allow_html=True)
@@ -130,7 +126,6 @@ def users():
 
             if col_save.button("💾 Salvar alterações", key=f"save_{user.id}"):
                 try:
-                    # Só envia o que foi alterado
                     new_password_clean = new_password.strip()
                     senha_alterada = bool(new_password_clean)
                     exp_alterado = new_exp_minutes != user.token_exp_minutes

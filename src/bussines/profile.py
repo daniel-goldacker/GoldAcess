@@ -1,5 +1,6 @@
 from db import SessionLocal, Profile
 from config import ConfigParametersApplication
+from bussines.user import user_has_profile
 
 def get_profiles(profile_id:int):
     session = SessionLocal()
@@ -30,6 +31,7 @@ def update_profile(profile_id: int, generate_token: bool, is_admin: bool, is_vis
         profile = session.query(Profile).filter_by(id=profile_id).first()
         if not profile:
             raise ValueError("Perfil não encontrado.")
+
         profile.generate_token = generate_token
         profile.is_admin = is_admin
         profile.is_visible = is_visible
@@ -44,6 +46,10 @@ def delete_profile(profile_id: int):
         profile = session.query(Profile).filter_by(id=profile_id).first()
         if not profile:
             raise ValueError("Perfil não encontrado.")
+        
+        if user_has_profile(profile_id):
+            raise ValueError("Perfil está sendo utilizado por um usuário.")
+        
         session.delete(profile)
         session.commit()
         return True, "Perfil excluído com sucesso."
@@ -71,3 +77,25 @@ def get_default_profile():
     finally:
         session.close()
  
+def create_default_profiles():
+    session = SessionLocal()
+    is_admin_profile = session.query(Profile).filter_by(name=ConfigParametersApplication.PROFILE_SISTEMA).first()
+    if not is_admin_profile:
+        is_admin_profile = Profile(
+            name=ConfigParametersApplication.PROFILE_SISTEMA,
+            generate_token=False,
+            is_admin=True,
+            is_visible=False
+        )
+        session.add(is_admin_profile)
+
+        is_default_profile = Profile(
+            name=ConfigParametersApplication.PROFILE_PADRAO,
+            generate_token=False,
+            is_admin=False,
+            is_visible=False
+        )
+        session.add(is_default_profile)
+
+        session.commit()
+    session.close()

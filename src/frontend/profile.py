@@ -5,7 +5,6 @@ from config import ConfigParametersApplication
 def profile():
     st.subheader("🧩 Gerenciar Perfis")
 
-    # Campos padrão
     defaults = {
         "profile_name": "",
         "generate_token": False,
@@ -26,8 +25,6 @@ def profile():
         st.session_state.is_visible = True
         st.session_state.clear_fields = False
 
-
-    # Formulário de criação
     with st.expander("➕ Criar novo perfil"):
         profile_name = st.text_input("Nome do Perfil", key="profile_name")
         generate_token = st.checkbox("Pode gerar token?", key="generate_token")

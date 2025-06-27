@@ -6,7 +6,6 @@ import bcrypt
 
 Base = declarative_base()
 
-# Tabela de perfis
 class Profile(Base):
     __tablename__ = "profiles"
 
@@ -18,7 +17,6 @@ class Profile(Base):
     
     users = relationship("User", back_populates="profile")
 
-# Tabela de usuários
 class User(Base):
     __tablename__ = "users"
 
@@ -36,52 +34,3 @@ class User(Base):
 engine = create_engine(ConfigParametersDatabase.DATABASE)
 Base.metadata.create_all(bind=engine)
 SessionLocal = sessionmaker(bind=engine)
-
-# Criar perfis
-def create_profiles():
-    session = SessionLocal()
-    is_admin_profile = session.query(Profile).filter_by(name=ConfigParametersApplication.PROFILE_SISTEMA).first()
-    if not is_admin_profile:
-        is_admin_profile = Profile(
-            name=ConfigParametersApplication.PROFILE_SISTEMA,
-            generate_token=False,
-            is_admin=True,
-            is_visible=False
-        )
-        session.add(is_admin_profile)
-
-        is_default_profile = Profile(
-            name=ConfigParametersApplication.PROFILE_PADRAO,
-            generate_token=False,
-            is_admin=False,
-            is_visible=False
-        )
-        session.add(is_default_profile)
-
-        session.commit()
-    session.close()
-    
-
-# Criar usuário admin
-def create_admin_user():
-    session = SessionLocal()
-    is_admin_profile = session.query(Profile).filter_by(name=ConfigParametersApplication.PROFILE_SISTEMA).first()
-
-    is_admin = session.query(User).filter_by(username=ConfigParametersAdmin.NAME_ADMIN).first()
-    if not is_admin:
-        hashed_pw = bcrypt.hashpw(ConfigParametersAdmin.PASSWORD_ADMIN.encode(), bcrypt.gensalt())
-        is_admin_user = User(
-            username=ConfigParametersAdmin.NAME_ADMIN,
-            password=hashed_pw,
-            token_exp_minutes=ConfigParametersAdmin.TOKEN_EXP_MINUTES_ADMIN,
-            profile_id=is_admin_profile.id,
-            is_visible=False,
-            is_active = True
-        )
-        session.add(is_admin_user)
-        session.commit()
-    session.close()
-
-# Executa na inicialização
-create_profiles()
-create_admin_user()

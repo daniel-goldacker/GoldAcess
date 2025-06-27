@@ -19,7 +19,6 @@ def register():
             st.warning("As senhas não coincidem. Tente novamente.")
         else:
             try:
-    
                 add_user(
                     username=new_username,
                     password=new_password,
@@ -30,7 +29,7 @@ def register():
                 )
                 st.success("✅ Cadastro enviado! Aguarde liberação de um administrador.")
                 time_sleep()
-                st.rerun()  # Para fechar o dialog automaticamente
+                st.rerun()
             except Exception as e:
                 st.error(f"❌ Erro ao cadastrar: {e}")
 

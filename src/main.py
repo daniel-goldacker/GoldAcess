@@ -6,6 +6,8 @@ from frontend.profile import profile
 from frontend.home import home
 from frontend.apidocs import api_docs
 from frontend.logout import logout
+from bussines.profile import create_default_profiles
+from bussines.user import create_user_admin
 
 # --- Inicializa sessão ---
 if "logged_in" not in st.session_state:
@@ -14,6 +16,9 @@ if "username_logged" not in st.session_state:
     st.session_state.username_logged = ""
 if "menu" not in st.session_state:
     st.session_state.menu = "Home"
+
+create_default_profiles()
+create_user_admin()
 
 # --- MENU LATERAL ---
 with st.sidebar:

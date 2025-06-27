@@ -2,7 +2,18 @@ import bcrypt
 from db import SessionLocal, User
 from sqlalchemy.orm import joinedload
 from typing import Optional
-from config import ConfigParametersApplication
+from db import Profile
+from config import ConfigParametersApplication, ConfigParametersAdmin
+
+def user_has_profile(profile_id:int):
+    session = SessionLocal()
+    try:
+        user = session.query(User).filter_by(profile_id=profile_id).first()
+        if not user:
+            return False
+        return True
+    finally:
+        session.close()
 
 def add_user(username: str, password: str, token_exp_minutes: int, profile_id: int, is_visible: bool, is_active: bool):
     session = SessionLocal()
@@ -97,3 +108,22 @@ def authenticate(username: str, password: str):
             return False
     finally:
         session.close()
+
+def create_user_admin():
+    session = SessionLocal()
+    is_admin_profile = session.query(Profile).filter_by(name=ConfigParametersApplication.PROFILE_SISTEMA).first()
+
+    is_admin = session.query(User).filter_by(username=ConfigParametersAdmin.NAME_ADMIN).first()
+    if not is_admin:
+        hashed_pw = bcrypt.hashpw(ConfigParametersAdmin.PASSWORD_ADMIN.encode(), bcrypt.gensalt())
+        is_admin_user = User(
+            username=ConfigParametersAdmin.NAME_ADMIN,
+            password=hashed_pw,
+            token_exp_minutes=ConfigParametersAdmin.TOKEN_EXP_MINUTES_ADMIN,
+            profile_id=is_admin_profile.id,
+            is_visible=False,
+            is_active = True
+        )
+        session.add(is_admin_user)
+        session.commit()
+    session.close()
