@@ -6,14 +6,15 @@ from frontend.profile import profile
 from frontend.home import home
 from frontend.apidocs import api_docs
 from frontend.logout import logout
+from frontend.monitoring import monitoring
 from bussines.profile import create_default_profiles
 from bussines.user import create_user_admin
 from PIL import Image
 
-icon = Image.open("img/GoldCo.ico")
+icon = Image.open("img/GoldAcess.ico")
 
 st.set_page_config(
-    page_title="GoldCo. Autenticação",
+    page_title="GoldAcess. Autenticação",
     page_icon=icon,
     layout="centered"
 )
@@ -33,8 +34,8 @@ create_user_admin()
 with st.sidebar:
 
     if st.session_state.logged_in:
-        menu_items = ["Home", "Usuário", "Perfil", "API Docs", "Logout"]
-        icons = ["house", "person-plus", "people", "book", "box-arrow-right"]
+        menu_items = ["Home", "Usuário", "Perfil", "Monitoramento", "API Docs", "Logout"]
+        icons = ["house", "person-plus", "people", "activity", "book", "box-arrow-right"]
     else:
         menu_items = ["Home", "API Docs", "Login"]
         icons = ["house", "book", "box-arrow-in-right"]
@@ -64,6 +65,8 @@ elif st.session_state.menu == "Usuário" and st.session_state.logged_in:
     users()
 elif st.session_state.menu == "Perfil" and st.session_state.logged_in:
     profile()
+elif st.session_state.menu == "Monitoramento" and st.session_state.logged_in:
+    monitoring()
 elif st.session_state.menu == "API Docs":
     api_docs()
 elif st.session_state.menu == "Login":

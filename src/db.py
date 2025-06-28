@@ -1,8 +1,10 @@
 import os
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, create_engine, LargeBinary
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, create_engine, LargeBinary, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from config import ConfigParametersDatabase
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 Base = declarative_base()
 
@@ -29,6 +31,17 @@ class User(Base):
     is_active = Column(Boolean, default=True)
 
     profile = relationship("Profile", back_populates="users")
+    tokens = relationship("UserToken", back_populates="user", cascade="all, delete-orphan")
+
+class UserToken(Base):
+    __tablename__ = "user_tokens"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    token = Column(String, nullable=False)
+    created_at =  Column(DateTime, default=lambda: datetime.now(ZoneInfo("America/Sao_Paulo")))
+
+    user = relationship("User", back_populates="tokens")
 
 # Configuração e criação das tabelas
 os.makedirs(ConfigParametersDatabase.LOCAL_DB, exist_ok=True)
