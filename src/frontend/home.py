@@ -23,6 +23,7 @@ def home():
     - 👤 **Usuários**
     - 🛡️ **Perfis de acesso**
     - 🔐 **Tokens de autenticação**
+    - 📊 **Monitoramento**  
     - ⚙️ **Configurações de segurança**
     
     ---
