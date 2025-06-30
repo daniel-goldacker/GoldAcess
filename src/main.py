@@ -4,9 +4,9 @@ from frontend.login import login
 from frontend.user import users
 from frontend.profile import profile
 from frontend.home import home
-from frontend.apidocs import api_docs
+from frontend.documentation.apidocs import api_docs
 from frontend.logout import logout
-from frontend.monitoring import monitoring
+from frontend.dashboard import dashboard
 from bussines.profile import create_default_profiles
 from bussines.user import create_user_admin
 from PIL import Image
@@ -34,8 +34,8 @@ create_user_admin()
 with st.sidebar:
 
     if st.session_state.logged_in:
-        menu_items = ["Home", "Usuário", "Perfil", "Monitoramento", "API Docs", "Logout"]
-        icons = ["house", "person-plus", "people", "activity", "book", "box-arrow-right"]
+        menu_items = ["Home", "Usuário", "Perfil", "Dashboard", "API Docs", "Logout"]
+        icons = ["house", "person-plus", "people", "speedometer2", "book", "box-arrow-right"]
     else:
         menu_items = ["Home", "API Docs", "Login"]
         icons = ["house", "book", "box-arrow-in-right"]
@@ -43,7 +43,7 @@ with st.sidebar:
     if st.session_state.username_logged:
         st.markdown(f"👋 Bem vindo, **{st.session_state.username_logged}**!")
     else: 
-        st.markdown("🙅‍♂️ Nenhum usuário logado.")    
+        st.markdown("⚠️ Nenhum usuário logado.")    
 
     selected = option_menu(
         "Menu",
@@ -65,8 +65,8 @@ elif st.session_state.menu == "Usuário" and st.session_state.logged_in:
     users()
 elif st.session_state.menu == "Perfil" and st.session_state.logged_in:
     profile()
-elif st.session_state.menu == "Monitoramento" and st.session_state.logged_in:
-    monitoring()
+elif st.session_state.menu == "Dashboard" and st.session_state.logged_in:
+    dashboard()
 elif st.session_state.menu == "API Docs":
     api_docs()
 elif st.session_state.menu == "Login":
