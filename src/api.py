@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Form, Header, status
 from fastapi.responses import JSONResponse
-from bussines.token import generate_token, verify_token
+from bussines.token import generate_token, verify_token, store_request_logs
 from bussines.user import authenticate
 from bussines.profile import get_profiles
 
@@ -9,31 +9,36 @@ app = FastAPI()
 @app.post("/api/auth")
 def api_auth(username: str = Form(...), password: str = Form(...)):
     user = authenticate(username, password)
+
     if user:
         if user.is_active: 
             profile = get_profiles(user.profile_id)
 
             if profile.generate_token:
                 token = generate_token(user)
+                store_request_logs(status.HTTP_200_OK)
                 return JSONResponse(
                     status_code=status.HTTP_200_OK,
                     content={"status": "ok", "token": token}
                 )
             else:
+                store_request_logs(status.HTTP_403_FORBIDDEN)
                 return JSONResponse(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    status_code=status.HTTP_403_FORBIDDEN,
                     content={"status": "fail", "message": "Usuário não liberado para solicitação de tokens"}
                 )
-        else: 
+        else:
+            store_request_logs(status.HTTP_403_FORBIDDEN)
             return JSONResponse(
-                status_code=status.HTTP_401_UNAUTHORIZED,
+                status_code=status.HTTP_403_FORBIDDEN,
                 content={"status": "fail", "message": "Usuário ainda não está liberado! Aguarde liberação de um administrador."}
             )                
 
+    store_request_logs(status.HTTP_401_UNAUTHORIZED)
     return JSONResponse(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                content={"status": "fail", "message": "Credenciais inválidas"}
-            )
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        content={"status": "fail", "message": "Credenciais inválidas"}
+    )
 
 @app.get("/api/verify")
 def api_verify(authorization: str = Header(...)):

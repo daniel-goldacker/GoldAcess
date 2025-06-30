@@ -39,9 +39,16 @@ class UserToken(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     token = Column(String, nullable=False)
-    created_at =  Column(DateTime, default=lambda: datetime.now(ZoneInfo("America/Sao_Paulo")))
+    generated_at =  Column(DateTime, default=lambda: datetime.now(ZoneInfo("America/Sao_Paulo")))
 
     user = relationship("User", back_populates="tokens")
+
+class RequestLog(Base):
+    __tablename__ = "request_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    http_status = Column(Integer, nullable=False)
+    requested_at = Column(DateTime, default=lambda: datetime.now(ZoneInfo("America/Sao_Paulo")))
 
 # Configuração e criação das tabelas
 os.makedirs(ConfigParametersDatabase.LOCAL_DB, exist_ok=True)

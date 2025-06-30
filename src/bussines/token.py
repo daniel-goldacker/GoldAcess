@@ -2,7 +2,7 @@
 import jwt
 import pandas as pd
 from datetime import datetime, timedelta
-from db import SessionLocal, User, UserToken
+from db import SessionLocal, User, UserToken, RequestLog
 from config import ConfigParametersSecurity
 from sqlalchemy.orm import joinedload
 
@@ -24,13 +24,25 @@ def get_all_tokens():
     try: 
         tokens = session.query(UserToken).options(joinedload(UserToken.user)).all()
         data = [
-            {"Usuário": token.user.username, "Data": token.created_at.date()}
-            for token in tokens if token.created_at
+            {"Usuário": token.user.username, "Data": token.generated_at.date()}
+            for token in tokens if token.generated_at
         ]        
         return pd.DataFrame(data)
     finally:
         session.close()
     
+
+def get_all_request_logs():
+    session = SessionLocal()
+    try:
+        logs = session.query(RequestLog).all()
+        data = [
+            {"Data": log.requested_at.date(), "Status HTTP": log.http_status}
+            for log in logs
+        ]
+        return pd.DataFrame(data)
+    finally:
+        session.close()
 
 def verify_token(token: str):
     try:
@@ -48,9 +60,18 @@ def store_token(user, token):
         user_token = UserToken(user_id=user.id, token=token)
         session.add(user_token)
         session.commit()
-        return True, "Usuário criado com sucesso."
     finally:
         session.close()
+
+def store_request_logs(http_status):
+    session = SessionLocal()
+    try: 
+        request_logs = RequestLog(http_status=http_status)
+        session.add(request_logs)
+        session.commit()
+    finally:
+        session.close()
+
 
 
 
