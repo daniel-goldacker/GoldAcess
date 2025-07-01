@@ -14,7 +14,9 @@ class ConfigParametersApplication():
     TOKEN_EXP_MINUTES_AUTOMATIC_USER_CREATION = os.getenv('TOKEN_EXP_MINUTES_AUTOMATIC_USER_CREATION')
     TOKEN_EXP_MINUTES_NEW_USER = 60
     DEFAULT_TIME_SLEEP = 2
-   
+    USERS_PER_PAGE = 10
+    PROFILE_PER_PAGE = 10
+
 class ConfigParametersDatabase():    
     LOCAL_DB = 'database'
     URI_CONNECTION = f'sqlite:///{LOCAL_DB}/database.db'

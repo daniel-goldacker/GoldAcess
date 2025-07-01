@@ -31,7 +31,7 @@ def users():
         username = st.text_input("Usuário", key="username")
         password = st.text_input("Senha", type="password", key="password")
         exp_minutes = st.number_input("Minutos até expiração do token", min_value=0, key="exp_minutes")
-               
+
         profiles = get_all_profiles(st.session_state.profile_logger)
 
         if not profiles:
@@ -41,13 +41,14 @@ def users():
         profile_map = {p.name: p.id for p in profiles}
         selected_label = st.selectbox("Perfil do usuário", options=list(profile_map.keys()))
         selected_profile_id = profile_map[selected_label]
+
         if st.session_state.profile_logger == ConfigParametersApplication.PROFILE_SISTEMA:
             is_visible = st.checkbox("Visivel?", key=f"is_visible")
             is_active = st.checkbox("Ativo?", key=f"is_active")
         else:
             is_visible = True
             is_active = True    
-        
+
         if st.button("Criar"):
             if not username or not password:
                 st.warning("Usuário e senha são obrigatórios.")
@@ -65,12 +66,24 @@ def users():
     if "edit_user_id" not in st.session_state:
         st.session_state.edit_user_id = None
 
+    if "user_page" not in st.session_state:
+        st.session_state.user_page = 0
+
     users = get_all_users(st.session_state.profile_logger)
     profiles = get_all_profiles(st.session_state.profile_logger)
 
-    for user in users:
+    # Paginação
+    total_users = len(users)
+    total_pages = (total_users - 1) // ConfigParametersApplication.USERS_PER_PAGE + 1
+
+    start_idx = st.session_state.user_page * ConfigParametersApplication.USERS_PER_PAGE
+    end_idx = start_idx + ConfigParametersApplication.USERS_PER_PAGE
+    current_users = users[start_idx:end_idx]
+
+
+    for user in current_users:
         profile = get_profiles(user.profile_id)
-        
+
         col1, col2, col3, col4, col5, col6 = st.columns([2, 2, 2, 1, 1, 1])
         col1.markdown(f"<div style='white-space: nowrap;'><strong>👤 {user.username}</strong></div>", unsafe_allow_html=True)
         col2.markdown(f"<div style='white-space: nowrap;'><strong>🧩 {profile.name}</strong></div>", unsafe_allow_html=True)
@@ -79,10 +92,10 @@ def users():
         ativo_status = "✅ Ativo" if user.is_active else "❌ Inativo"
         col4.markdown(f"<div style='white-space: nowrap;'><strong>{ativo_status}</strong></div>", unsafe_allow_html=True)
 
-        if (ConfigParametersAdmin.NAME_ADMIN == user.username):
+        if ConfigParametersAdmin.NAME_ADMIN == user.username:
             edit_clicked = col5.button("✏️", key=f"edit_{user.id}", disabled=True)
             delete_clicked = col6.button("🗑️", key=f"delete_{user.id}", disabled=True)
-        else:    
+        else:
             edit_clicked = col5.button("✏️", key=f"edit_{user.id}")
             delete_clicked = col6.button("🗑️", key=f"delete_{user.id}")
 
@@ -108,20 +121,20 @@ def users():
             new_profile_map = {p.name: p.id for p in profiles}
             current_profile_name = next((p.name for p in profiles if p.id == user.profile_id), None)
             new_profile_label = st.selectbox(
-                                                "Perfil do usuário",
-                                                options=list(new_profile_map.keys()),
-                                                index=list(new_profile_map.keys()).index(current_profile_name) if current_profile_name else 0,
-                                                key=f"profile_{user.id}"
-                                            )
+                "Perfil do usuário",
+                options=list(new_profile_map.keys()),
+                index=list(new_profile_map.keys()).index(current_profile_name) if current_profile_name else 0,
+                key=f"profile_{user.id}"
+            )
             new_profile_id = new_profile_map[new_profile_label]
-           
+
             if st.session_state.profile_logger == ConfigParametersApplication.PROFILE_SISTEMA:
                 new_is_visible = st.checkbox("Visivel?", key=f"is_visible_{user.id}", value=user.is_visible)
                 new_is_active = st.checkbox("Ativo?", key=f"is_active_{user.id}", value=user.is_active)
             else:
                 new_is_visible = True
-                new_is_active  = True 
-            
+                new_is_active = True
+
             col_save, col_cancel = st.columns(2)
 
             if col_save.button("💾 Salvar alterações", key=f"save_{user.id}"):
@@ -144,7 +157,6 @@ def users():
                             new_is_visible=new_is_visible if is_visible_alterado else None,
                             new_is_active=new_is_active if is_active_alterado else None
                         )
-
                         st.session_state.edit_user_id = None
                         st.rerun()
                 except Exception as e:
@@ -153,3 +165,19 @@ def users():
             if col_cancel.button("❌ Cancelar", key=f"cancel_{user.id}"):
                 st.session_state.edit_user_id = None
                 st.rerun()
+
+    st.markdown("---")
+    st.markdown(f"📄 Página {st.session_state.user_page + 1} de {total_pages}")
+
+    # Criar 5 colunas para centralizar os botões: [espaço] [anterior] [espaço] [próximo] [espaço]
+    col_space1, col_prev, col_space2, col_next, col_space3 = st.columns([1, 2, 1, 2, 1])
+
+    with col_prev:
+        if st.button("⬅️ Anterior", disabled=st.session_state.user_page == 0):
+            st.session_state.user_page -= 1
+            st.rerun()
+
+    with col_next:
+        if st.button("➡️ Próximo", disabled=st.session_state.user_page >= total_pages - 1):
+            st.session_state.user_page += 1
+            st.rerun()
