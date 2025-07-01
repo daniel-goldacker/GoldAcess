@@ -20,6 +20,10 @@ class ConfigParametersApplication():
 class ConfigParametersDatabase():    
     LOCAL_DB = 'database'
     URI_CONNECTION = f'sqlite:///{LOCAL_DB}/database.db'
+    POOL_SIZE=20
+    MAX_OVERFLOW=10
+    POOL_TIMEOUT=30
+    POOL_RECYCLE=1800
 
 class ConfigParametersSecurity():
     SECRET_KEY = os.getenv('SECRET_KEY')
