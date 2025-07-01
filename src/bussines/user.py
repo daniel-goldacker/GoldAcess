@@ -100,8 +100,8 @@ def get_all_users(profile_logged: str):
 
 def authenticate(username: str, password: str):
     session = SessionLocal()
-    try: 
-        user = session.query(User).filter(User.username == username).first()
+    try:
+        user = session.query(User).options(joinedload(User.profile)).filter(User.username == username).first()
         if user and bcrypt.checkpw(password.encode(), user.password):
             return user
         else:

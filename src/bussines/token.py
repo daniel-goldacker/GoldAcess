@@ -1,6 +1,7 @@
 
 import jwt
 import pandas as pd
+import threading
 from datetime import datetime, timedelta
 from db import SessionLocal, User, UserToken, RequestLog
 from config import ConfigParametersSecurity
@@ -14,10 +15,11 @@ def generate_token(user: User):
         "exp": exp,
     }
 
-    tokeJWT = jwt.encode(payload, ConfigParametersSecurity.SECRET_KEY, algorithm=ConfigParametersSecurity.ALGORITHMS_CRYPTOGRAPHY)
-    store_token(user, tokeJWT)
-    
-    return tokeJWT
+    tokenJWT = jwt.encode(payload, ConfigParametersSecurity.SECRET_KEY, algorithm=ConfigParametersSecurity.ALGORITHMS_CRYPTOGRAPHY)
+    threading.Thread(target=store_token, args=(user, tokenJWT), daemon=True).start()
+
+    return tokenJWT
+
 
 def get_all_tokens():
     session = SessionLocal()
